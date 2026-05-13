@@ -17,7 +17,6 @@ function showScene(sceneName) {
   gameScreen.classList.add("hidden");
   clearScreen.classList.add("hidden");
 
-  return;
   // 必要な画面だけ表示
   if (sceneName === "start") {
     startScreen.classList.remove("hidden");
@@ -25,6 +24,8 @@ function showScene(sceneName) {
 
   if (sceneName === "game") {
     gameScreen.classList.remove("hidden");
+
+    renderBoard()
   }
 
   if (sceneName === "clear") {
@@ -40,9 +41,9 @@ startButton.addEventListener("click", () => {
 });
 
 // CLEARボタン
-clearButton.addEventListener("click", () => {
-  showScene("clear");
-});
+// clearButton.addEventListener("click", () => {
+//   showScene("clear");
+// });
 
 // NEXTボタン
 nextButton.addEventListener("click", () => {
@@ -55,36 +56,79 @@ showScene("start");
 
 
 const board = [
-    [1,1,1,1,1],
-        [1,1,1,1,1],
-        [1,1,0,0,0],
-        [1,1,0,0,0]
+    [1,1,1,1],
+    [1,1,1,1],
+    [1,1,0,0],
+    [1,1,0,0],
 ];
+
 
 function renderBoard() {
     //ボードの横の長さを調整
     boardElement.style.gridTemplateColumns = `repeat(${board[0].length}, 60px)`;
 
-  // 一旦中身を空にする
-//   boardElement.innerHTML = "";
+    // 一旦中身を空にする
+    boardElement.innerHTML = "";
 
-  for (let i = 0; i < board.length; i++) { //縦
-    for (let j = 0; j < board[i].length; j++) { //横
+    for (let i = 0; i < board.length; i++) { //縦
+        for (let j = 0; j < board[i].length; j++) { //横
 
-      // div生成
-      const cell = document.createElement("div");
+            // div生成
+            const cell = document.createElement("div");
 
-      // 共通クラス
-      cell.classList.add("cell");
+            // 共通クラス
+            cell.classList.add("cell");
 
-      // 値によって見た目変更
-      if (board[i][j] === 1) cell.classList.add("filled");
-      else cell.classList.add("empty");
+            // 値によって見た目変更
+            if (board[i][j] === 1) cell.classList.add("empty");
+            else cell.classList.add("none");
 
-      // boardに追加
-      boardElement.appendChild(cell);
+            // boardに追加
+            boardElement.appendChild(cell);
+
+            cell.addEventListener("mouseenter", () => {
+                console.log("ホバー開始");
+
+                //ドラッグ中か
+                if(isDragging) {
+                    if(cell.classList.contains("none"))return;
+                    if(cell.classList.contains("empty")) {
+                        cell.classList.add("filled");
+                        cell.classList.remove("empty");
+                    }else  {
+                        cell.classList.add("empty");
+                        cell.classList.remove("filled");
+                    }
+                }
+            });
+
+            // cell.addEventListener("click", () => {
+            //     console.log(`Click!`);
+
+            //     //emptyなら
+            //     if(cell.classList.contains("none"))return;
+            //     if(cell.classList.contains("empty")) {
+            //         cell.classList.add("filled");
+            //         cell.classList.remove("empty");
+            //     }else  {
+            //         cell.classList.add("empty");
+            //         cell.classList.remove("filled");
+            //     }
+
+                
+                
+            // });
+        }
     }
-  }
 }
 
-renderBoard()
+
+
+let isDragging = false;
+document.addEventListener("mousedown", () => {
+  isDragging = true;
+});
+document.addEventListener("mouseup", () => {
+  isDragging = false;
+});
+
