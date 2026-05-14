@@ -16,6 +16,7 @@ const returnButton = document.getElementById("return-button");
 import { datas } from "./datas.js";
 import { colors } from "./colors.js";
 import { random } from "./lib/Util.js"
+import { ProblemManager } from "./ProblemManager.js";
 
 // STARTボタン
 startButton.addEventListener("click", () => {
@@ -57,6 +58,7 @@ function showScene(sceneName) {
 
 	if (sceneName === "game") {
 		ingame = true;
+		piece = ProblemManager.createPiece(3, 1);
 		gameScreen.classList.remove("hidden");
 		resetButton.classList.remove("hidden");
 
@@ -76,8 +78,8 @@ function showScene(sceneName) {
  
 
 
-const board = datas.board;
-const piece = datas.piece
+let board = datas.board;
+let piece = datas.piece
 
 let filledPieces = [];
 let filledElements = [];
