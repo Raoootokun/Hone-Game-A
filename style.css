@@ -18,6 +18,17 @@ body {
   -webkit-user-select: none;
 }
 
+#version {
+  position: fixed;
+
+  top: 10px;
+  left: 10px;
+
+  margin: 0;
+
+  color: white;
+}
+
 /* 各シーン */
 .screen {
   width: 100%;
