@@ -111,7 +111,9 @@ function renderBoard() {
             // boardに追加
             boardElement.appendChild(cell);
 
-            cell.addEventListener("pointerenter", () => {
+			//mousemove
+			//pointerenter
+            cell.addEventListener("pointermove", () => {
                 if(isDragging) {
                   //虚空ますの場合
                   if(cell.classList.contains("none"))return;
@@ -137,18 +139,18 @@ let isClear = false;
 //ドラッグ判定
 let color = "";
 let isDragging = false;
-document.addEventListener("mousedown", () => {
-    filledPieces = [];
-    filledElements = [];
-    isDragging = true;
-	color = "#" + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0');
-});
-document.addEventListener("mouseup", () => {
-    isDragging = false;
+// document.addEventListener("mousedown", () => {
+//     filledPieces = [];
+//     filledElements = [];
+//     isDragging = true;
+// 	color = "#" + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0');
+// });
+// document.addEventListener("mouseup", () => {
+//     isDragging = false;
 
-    // console.log(filledPieces)
-    checkPiece()
-});
+//     // console.log(filledPieces)
+//     checkPiece()
+// });
 
 document.addEventListener("pointerdown", () => {
     filledPieces = [];
