@@ -70,13 +70,11 @@ function showScene(sceneName) {
 
 
 
-// 初期画面
-showScene("start");
+
  
 
 
 const board = data.board;
-
 const piece = data.piece
 
 let filledPieces = [];
@@ -401,4 +399,6 @@ function normalizeCoords(coords) {
 	return normalized;
 }
 
+// 初期画面
+showScene("start");
 console.log(`Ready!\nver.${version.join('.')}`);
