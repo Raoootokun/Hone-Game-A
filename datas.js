@@ -1,4 +1,4 @@
-export const data = {
+export const datas = {
     board: [
         [1,1,1,1],
         [1,1,1,1],

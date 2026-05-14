@@ -13,7 +13,7 @@ const resetButton = document.getElementById("reset-button");
 const nextButton = document.getElementById("next-button");
 const returnButton = document.getElementById("return-button");
 
-import { data } from "./data.js";
+import { datas } from "./datas.js";
 import { colors } from "./colors.js";
 import { random } from "./lib/Util.js"
 
@@ -74,8 +74,8 @@ function showScene(sceneName) {
  
 
 
-const board = data.board;
-const piece = data.piece
+const board = datas.board;
+const piece = datas.piece
 
 let filledPieces = [];
 let filledElements = [];
