@@ -1,6 +1,5 @@
 body {
   margin: 0;
-
   width: 100vw;
   height: 100vh;
 
@@ -8,6 +7,15 @@ body {
   color: white;
 
   font-family: sans-serif;
+
+  overflow: hidden;
+  touch-action: none;
+  overscroll-behavior: none;
+}
+
+* {
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* 各シーン */
@@ -47,6 +55,7 @@ button {
   width: fit-content;
 
   gap: 4px; /*マスの間隔*/
+  touch-action: none;
 }
 
 .cell {
