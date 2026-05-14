@@ -103,6 +103,9 @@ function renderBoard() {
 
             // 共通クラス
             cell.classList.add("cell");
+            cell.classList.add(`n_${i}_${j}`);
+			cell.dataset.row = i;
+			cell.dataset.col = j;
 
             // 値によって見た目変更
             if (board[i][j] === 1) cell.classList.add("empty");
@@ -113,21 +116,38 @@ function renderBoard() {
 
 			//mousemove
 			//pointerenter
-            cell.addEventListener("pointermove", () => {
-                if(isDragging) {
-                  //虚空ますの場合
-                  if(cell.classList.contains("none"))return;
+            cell.addEventListener("pointermove", (e) => { //押したら
+				const element = document.elementFromPoint(e.x, e.y);
+				//虚空マスの場合
+				if(element.classList.contains("none"))return;
 
-                  if(cell.classList.contains("empty")) {
-                      cell.classList.add("filled");
-                      cell.classList.remove("empty");
-					  cell.style.background = color;
+				if(element.classList.contains("empty")) {
+					element.classList.add("filled");
+					element.classList.remove("empty");
+					element.style.background = color;
 
-                      filledPieces.push([i, j]);
-                      filledElements.push(cell);
-                  }
+					filledPieces.push([element.dataset.row, element.dataset.col]);
+					filledElements.push(element);
+					console.log(`${element.dataset.row}/${element.dataset.col}`)
+				}
 
-                }
+				// console.log(`pointermove: ${i}${j}`);
+				// console.log(document.elementFromPoint(e.x, e.y).classList)
+
+                // if(isDragging) {
+                //   //虚空ますの場合
+                //   if(cell.classList.contains("none"))return;
+
+                //   if(cell.classList.contains("empty")) {
+                //       cell.classList.add("filled");
+                //       cell.classList.remove("empty");
+				// 	  cell.style.background = color;
+
+                //       filledPieces.push([i, j]);
+                //       filledElements.push(cell);
+                //   }
+
+                // }
             });
         }
     }
@@ -153,12 +173,16 @@ let isDragging = false;
 // });
 
 document.addEventListener("pointerdown", () => {
+	console.log('Down');
+
     filledPieces = [];
     filledElements = [];
     isDragging = true;
 	color = "#" + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0');
 });
 document.addEventListener("pointerup", () => {
+	console.log('Up');
+
     isDragging = false;
 
     // console.log(filledPieces)
@@ -207,7 +231,7 @@ function checkPiece() {
 			filledBoard[data[0]][data[1]] = 1;
 		}
 
-		console.log("一致！");
+		// console.log("一致！");
 		
 		if(JSON.stringify(filledBoard) === JSON.stringify(board)) {
 			resetButton.classList.add("hidden");
@@ -225,9 +249,8 @@ function checkPiece() {
 		//不一致の場合
 		for(const element of filledElements) {
 			element.style.background =  "#aa0000";
-			console.log('a')
 		}
-		console.log("不一致");
+		// console.log("不一致");
 	}
 }
 
