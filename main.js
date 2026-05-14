@@ -51,10 +51,12 @@ function showScene(sceneName) {
 
 	// 必要な画面だけ表示
 	if (sceneName === "start") {
+		ingame = false;
 		startScreen.classList.remove("hidden");
 	}
 
 	if (sceneName === "game") {
+		ingame = true;
 		gameScreen.classList.remove("hidden");
 		resetButton.classList.remove("hidden");
 
@@ -80,7 +82,7 @@ const piece = datas.piece
 let filledPieces = [];
 let filledElements = [];
 let filledBoard = [];
-
+let ingame = false;
 
 
 function renderBoard() {
@@ -91,12 +93,9 @@ function renderBoard() {
 		}
 	}
 
-	
 
 	//参照ピースを表示
-	//ボードの横の長さを調整
     exPieceElement.style.gridTemplateColumns = `repeat(${piece[0].length}, 40px)`;
-    // 一旦中身を空にする
     exPieceElement.innerHTML = "";
 	for (let i = 0; i < piece.length; i++) { //縦
         for (let j = 0; j < piece[i].length; j++) { //横
@@ -121,7 +120,6 @@ function renderBoard() {
     boardElement.style.gridTemplateColumns = `repeat(${board[0].length}, 60px)`;
     // 一旦中身を空にする
     boardElement.innerHTML = "";
-
     for (let i = 0; i < board.length; i++) { //縦
         for (let j = 0; j < board[i].length; j++) { //横
 
@@ -130,7 +128,6 @@ function renderBoard() {
 
             // 共通クラス
             cell.classList.add("cell");
-            cell.classList.add(`n_${i}_${j}`);
 			cell.dataset.row = i;
 			cell.dataset.col = j;
 
@@ -156,25 +153,11 @@ function renderBoard() {
 					filledPieces.push([element.dataset.row, element.dataset.col]);
 					filledElements.push(element);
 					console.log(`${element.dataset.row}/${element.dataset.col}`)
+
+					const sound = new Audio("./sounds/filled.mp3");
+					sound.currentTime = 0;
+					sound.play();
 				}
-
-				// console.log(`pointermove: ${i}${j}`);
-				// console.log(document.elementFromPoint(e.x, e.y).classList)
-
-                // if(isDragging) {
-                //   //虚空ますの場合
-                //   if(cell.classList.contains("none"))return;
-
-                //   if(cell.classList.contains("empty")) {
-                //       cell.classList.add("filled");
-                //       cell.classList.remove("empty");
-				// 	  cell.style.background = color;
-
-                //       filledPieces.push([i, j]);
-                //       filledElements.push(cell);
-                //   }
-
-                // }
             });
         }
     }
@@ -186,12 +169,16 @@ let color = "";
 let isDragging = false;
 
 document.addEventListener("pointerdown", () => {
+	if(!ingame)return;
+
     filledPieces = [];
     filledElements = [];
     isDragging = true;
 	color = colors.filled[random(0, colors.filled.length-1, true)];
 });
 document.addEventListener("pointerup", () => {
+	if(!ingame)return;
+
     isDragging = false;
 
     checkPiece()
@@ -205,20 +192,14 @@ document.addEventListener("pointerup", () => {
 function checkPiece() {
 	// player側
 	const normalizedPlayer =normalizeCoords(filledPieces);
-
 	// pieceの全パターン取得
 	const piecePatterns =getAllPiecePatterns(piece);
-
+	if(normalizedPlayer.length == 0)return;
 
 	let same = false;
 	// 全パターン比較
 	for (const pattern of piecePatterns) {
-
-		const normalizedPattern =
-		normalizeCoords(
-			pieceToCoords(pattern)
-		);
-
+		const normalizedPattern = normalizeCoords(pieceToCoords(pattern));
 
 		// 一致判定
 		if (
@@ -233,7 +214,6 @@ function checkPiece() {
 		}
 	}
 
-
 	if (same) {
 		for (const data of filledPieces) {
 			filledBoard[data[0]][data[1]] = 1;
@@ -245,10 +225,12 @@ function checkPiece() {
 			resetButton.classList.add("hidden");
 			nextButton.classList.remove("hidden");
 
-			document.getElementById("text1").textContent = `CLEAR!!`
+			document.getElementById("text1").textContent = `CLEAR!!`;
+			ingame = false;
 		}
 		
-		
+		const sound = new Audio("./sounds/click.mp3");
+		sound.play();
 
 
 		
@@ -258,7 +240,10 @@ function checkPiece() {
 		for(const element of filledElements) {
 			element.style.background = colors.out;
 		}
-		// console.log("不一致");
+		
+		const sound = new Audio("./sounds/out.mp3");
+		sound.playbackRate = 3.5;
+		sound.play();
 	}
 }
 
