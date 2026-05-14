@@ -1,3 +1,6 @@
+const version = [ 0, 27 ];
+document.getElementById("version").textContent = `ver.${version.join('.')}`;
+
 // 各シーン取得
 const startScreen = document.getElementById("start-screen");
 const gameScreen = document.getElementById("game-screen");
@@ -397,3 +400,5 @@ function normalizeCoords(coords) {
 
 	return normalized;
 }
+
+console.log(`Ready!\nver.${version.join('.')}`);
