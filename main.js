@@ -2,12 +2,17 @@
 const startScreen = document.getElementById("start-screen");
 const gameScreen = document.getElementById("game-screen");
 const boardElement  = document.getElementById("board");
+const exPieceElement  = document.getElementById("ex-piece-board");
 
 // ボタン取得
 const startButton = document.getElementById("start-button");
 const resetButton = document.getElementById("reset-button");
 const nextButton = document.getElementById("next-button");
+const returnButton = document.getElementById("return-button");
 
+import { data } from "./data.js";
+import { colors } from "./colors.js";
+import { random } from "./lib/Util.js"
 
 // STARTボタン
 startButton.addEventListener("click", () => {
@@ -28,6 +33,12 @@ nextButton.addEventListener("click", () => {
 });
 
 
+// RETURNボタン
+returnButton.addEventListener("click", () => {
+  	showScene("start");
+});
+
+
 // シーン切替関数
 function showScene(sceneName) {
 	// 一旦全部隠す
@@ -44,7 +55,6 @@ function showScene(sceneName) {
 		gameScreen.classList.remove("hidden");
 		resetButton.classList.remove("hidden");
 
-		isClear = false;
 		renderBoard()
 
 		document.getElementById("text1").textContent = `FIGHT ^^`
@@ -62,17 +72,9 @@ showScene("start");
  
 
 
-const board = [
-    [1,1,],
-    [1,1,],
-    [1,1,],
-    [1,1,],
-];
+const board = data.board;
 
-const piece = [
-    [1,0],
-    [1,0],
-];
+const piece = data.piece
 
 let filledPieces = [];
 let filledElements = [];
@@ -88,10 +90,34 @@ function renderBoard() {
 		}
 	}
 
+	
+
+	//参照ピースを表示
+	//ボードの横の長さを調整
+    exPieceElement.style.gridTemplateColumns = `repeat(${piece[0].length}, 40px)`;
+    // 一旦中身を空にする
+    exPieceElement.innerHTML = "";
+	for (let i = 0; i < piece.length; i++) { //縦
+        for (let j = 0; j < piece[i].length; j++) { //横
+
+            // div生成
+            const cell = document.createElement("div");
+
+            // 共通クラス
+            cell.classList.add("ex-piece");
+
+            // 値によって見た目変更
+            if (piece[i][j] === 1) cell.classList.add("ex-piece-filled");
+			else cell.classList.add("ex-piece-none");
+
+            // pieceに追加
+            exPieceElement.appendChild(cell);
+        }
+    }
+
 
     //ボードの横の長さを調整
     boardElement.style.gridTemplateColumns = `repeat(${board[0].length}, 60px)`;
-
     // 一旦中身を空にする
     boardElement.innerHTML = "";
 
@@ -155,37 +181,18 @@ function renderBoard() {
 
 
 let clearCount = 0;
-let isClear = false;
-//ドラッグ判定
 let color = "";
 let isDragging = false;
-// document.addEventListener("mousedown", () => {
-//     filledPieces = [];
-//     filledElements = [];
-//     isDragging = true;
-// 	color = "#" + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0');
-// });
-// document.addEventListener("mouseup", () => {
-//     isDragging = false;
-
-//     // console.log(filledPieces)
-//     checkPiece()
-// });
 
 document.addEventListener("pointerdown", () => {
-	console.log('Down');
-
     filledPieces = [];
     filledElements = [];
     isDragging = true;
-	color = "#" + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0');
+	color = colors.filled[random(0, colors.filled.length-1, true)];
 });
 document.addEventListener("pointerup", () => {
-	console.log('Up');
-
     isDragging = false;
 
-    // console.log(filledPieces)
     checkPiece()
 });
 
@@ -248,7 +255,7 @@ function checkPiece() {
 	else {
 		//不一致の場合
 		for(const element of filledElements) {
-			element.style.background =  "#aa0000";
+			element.style.background = colors.out;
 		}
 		// console.log("不一致");
 	}

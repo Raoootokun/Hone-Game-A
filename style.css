@@ -3,7 +3,7 @@ body {
   width: 100vw;
   height: 100vh;
 
-  background: #111;
+  background: #0f0f0a;
   color: white;
 
   font-family: sans-serif;
@@ -69,6 +69,18 @@ button {
   touch-action: none;
 }
 
+
+
+
+.cell {
+  width: 60px;
+  height: 60px;
+
+  /* border: 1px solid #444; */
+}
+
+
+
 .cell {
   width: 60px;
   height: 60px;
@@ -93,3 +105,24 @@ button {
   border: none;
 }
 
+
+#ex-piece-board {
+  display: grid;
+  margin: 0 auto;
+  width: fit-content;
+
+  gap: 1px; /*マスの間隔*/
+  touch-action: none;
+}
+.ex-piece {
+  width: 40px;
+  height: 40px;
+}
+.ex-piece-filled {
+  background: #e2e0d4;
+  border: none;
+}
+.ex-piece-none {
+  background: transparent;
+  border: none;
+}

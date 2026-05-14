@@ -1,6 +1,6 @@
-export const DATA = {
-    stage: [
-         [1,1,1,1],
+export const data = {
+    board: [
+        [1,1,1,1],
         [1,1,1,1],
         [1,1,0,0],
         [1,1,0,0]
