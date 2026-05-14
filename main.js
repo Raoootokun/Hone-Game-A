@@ -62,8 +62,18 @@ const board = [
     [1,1,0,0],
 ];
 
+const piece = [
+    [1,1],
+    [1,0],
+];
+
+let filledPieces = [];
+
+
 
 function renderBoard() {
+    
+
     //ボードの横の長さを調整
     boardElement.style.gridTemplateColumns = `repeat(${board[0].length}, 60px)`;
 
@@ -86,49 +96,118 @@ function renderBoard() {
             // boardに追加
             boardElement.appendChild(cell);
 
-            cell.addEventListener("mouseenter", () => {
-                console.log("ホバー開始");
+            cell.addEventListener("mousemove", () => {
+                console.log(isDragging);
 
-                //ドラッグ中か
                 if(isDragging) {
-                    if(cell.classList.contains("none"))return;
-                    if(cell.classList.contains("empty")) {
-                        cell.classList.add("filled");
-                        cell.classList.remove("empty");
-                    }else  {
-                        cell.classList.add("empty");
-                        cell.classList.remove("filled");
-                    }
+                  //虚空ますの場合
+                  if(cell.classList.contains("none"))return;
+
+                  if(cell.classList.contains("empty")) {
+                      cell.classList.add("filled");
+                      cell.classList.remove("empty");
+
+                      filledPieces.push([i, j]);
+                  }
+
                 }
             });
-
-            // cell.addEventListener("click", () => {
-            //     console.log(`Click!`);
-
-            //     //emptyなら
-            //     if(cell.classList.contains("none"))return;
-            //     if(cell.classList.contains("empty")) {
-            //         cell.classList.add("filled");
-            //         cell.classList.remove("empty");
-            //     }else  {
-            //         cell.classList.add("empty");
-            //         cell.classList.remove("filled");
-            //     }
-
-                
-                
-            // });
         }
     }
 }
 
 
 
+
+//ドラッグ判定
 let isDragging = false;
 document.addEventListener("mousedown", () => {
-  isDragging = true;
+    filledPieces = [];
+    isDragging = true;
 });
 document.addEventListener("mouseup", () => {
-  isDragging = false;
+    isDragging = false;
+
+    // console.log(filledPieces)
+    checkPiece()
 });
 
+
+
+// ======================
+// piece判定
+// ======================
+
+function checkPiece() {
+
+  // player側
+  const normalizedPlayer = normalizeCoords(filledPieces);
+
+  // piece側
+  const normalizedPiece = normalizeCoords(pieceToCoords(piece));
+
+
+  console.log("player", normalizedPlayer);
+  console.log("piece", normalizedPiece);
+
+
+  // 比較
+  const same = JSON.stringify(normalizedPlayer) === JSON.stringify(normalizedPiece);
+
+
+  if (same) {
+    console.log("一致！");
+  }
+  else {
+    console.log("不一致");
+  }
+}
+
+
+// ======================
+// piece → 座標変換
+// ======================
+
+function pieceToCoords(pieceData) {
+    const coords = [];
+
+    for (let i = 0; i < pieceData.length; i++) {
+        for (let j = 0; j < pieceData[i].length; j++) {
+            if (pieceData[i][j] === 1) {
+                coords.push([i, j]);
+            }
+        }
+    }
+
+    return coords;
+}
+
+
+// ======================
+// 左上基準へ変換
+// ======================
+
+function normalizeCoords(coords) {
+    let minRow = Infinity;
+    let minCol = Infinity;
+
+    // 最小座標取得
+    for (const [row, col] of coords) {
+        if (row < minRow) minRow = row;
+        if (col < minCol) minCol = col;
+    }
+
+    // 左上基準へ変換
+    const normalized = [];
+    for (const [row, col] of coords) {
+        normalized.push([
+        row - minRow,
+        col - minCol
+        ]);
+    }
+
+    // ソート
+    normalized.sort();
+
+    return normalized;
+}
