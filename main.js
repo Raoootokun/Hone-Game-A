@@ -1,4 +1,4 @@
-const version = [ 0,51 ];
+const version = [ 0,52 ];
 document.getElementById("version").textContent = `ver.${version.join('.')}`;
 
 // 各シーン取得
