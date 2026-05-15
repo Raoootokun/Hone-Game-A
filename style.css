@@ -71,19 +71,11 @@ button {
 
 
 
+ 
 
 .cell {
-  width: 60px;
-  height: 60px;
-
-  /* border: 1px solid #444; */
-}
-
-
-
-.cell {
-  width: 60px;
-  height: 60px;
+  width: 35px;
+  height: 35px;
 
   /* border: 1px solid #444; */
 }
@@ -115,8 +107,8 @@ button {
   touch-action: none;
 }
 .ex-piece {
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
 }
 .ex-piece-filled {
   background: #e2e0d4;

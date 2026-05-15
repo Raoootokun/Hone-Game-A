@@ -1,4 +1,4 @@
-const version = [ 0, 28 ];
+const version = [ 0, 29 ];
 document.getElementById("version").textContent = `ver.${version.join('.')}`;
 
 // 各シーン取得
@@ -58,7 +58,10 @@ function showScene(sceneName) {
 
 	if (sceneName === "game") {
 		ingame = true;
-		piece = ProblemManager.createPiece(3, 1);
+		piece = ProblemManager.createPiece(4, 10);
+		board = ProblemManager.createBoard(piece, 4);
+
+
 		gameScreen.classList.remove("hidden");
 		resetButton.classList.remove("hidden");
 
@@ -97,7 +100,7 @@ function renderBoard() {
 
 
 	//参照ピースを表示
-    exPieceElement.style.gridTemplateColumns = `repeat(${piece[0].length}, 40px)`;
+    exPieceElement.style.gridTemplateColumns = `repeat(${piece[0].length}, 30px)`;
     exPieceElement.innerHTML = "";
 	for (let i = 0; i < piece.length; i++) { //縦
         for (let j = 0; j < piece[i].length; j++) { //横
@@ -119,7 +122,7 @@ function renderBoard() {
 
 
     //ボードの横の長さを調整
-    boardElement.style.gridTemplateColumns = `repeat(${board[0].length}, 60px)`;
+    boardElement.style.gridTemplateColumns = `repeat(${board[0].length}, 35px)`;
     // 一旦中身を空にする
     boardElement.innerHTML = "";
     for (let i = 0; i < board.length; i++) { //縦
@@ -158,7 +161,7 @@ function renderBoard() {
 
 					const sound = new Audio("./sounds/filled.mp3");
 					sound.currentTime = 0;
-					sound.play();
+					// sound.play();
 				}
             });
         }
@@ -389,3 +392,4 @@ function normalizeCoords(coords) {
 // 初期画面
 showScene("start");
 console.log(`Ready!\nver.${version.join('.')}`);
+
