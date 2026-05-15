@@ -1,4 +1,4 @@
-const version = [ 0, 29 ];
+const version = [ 0,51 ];
 document.getElementById("version").textContent = `ver.${version.join('.')}`;
 
 // 各シーン取得
@@ -58,8 +58,8 @@ function showScene(sceneName) {
 
 	if (sceneName === "game") {
 		ingame = true;
-		piece = ProblemManager.createPiece(4, 10);
-		board = ProblemManager.createBoard(piece, 4);
+		piece = ProblemManager.createPiece(5, 0);
+		board = ProblemManager.createBoard(piece);
 
 
 		gameScreen.classList.remove("hidden");
@@ -147,6 +147,8 @@ function renderBoard() {
 			//pointerenter
             cell.addEventListener("pointermove", (e) => { //押したら
 				const element = document.elementFromPoint(e.x, e.y);
+				if(!element)return;
+
 				//虚空マスの場合
 				if(element.classList.contains("none"))return;
 

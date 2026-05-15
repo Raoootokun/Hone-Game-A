@@ -13,13 +13,10 @@ export class ProblemManager {
         // ======================
 
         const piece = [];
-
         for(let i = 0; i < size; i++) {
-
             piece.push(
                 new Array(size).fill(0)
             );
-
         }
 
 
@@ -203,6 +200,165 @@ export class ProblemManager {
     }
 
 
+    static createBoard(piece) {
+        const maxSize = 10;
+        //ベースを生成
+        let board = [];
+        for(let i = 0; i < maxSize; i++) {
+            board.push(new Array(maxSize).fill(0));
+        }
+
+    
+        let oldCells = [];
+        //ランダムに配置
+        for(let i=0; i<30; i++) {
+            const res = this.tryPlacePiece(board, piece, maxSize, oldCells);
+            if(res)board = res;
+        }
+ 
+ 
+        console.log(oldCells)
+        return board;
+    }
+
+    static tryPlacePiece(board, piece, maxSize, oldCells) {
+
+        //oldCellsから既存の設置座標を取得
+        if(oldCells.length == 0) {
+            while(true) {
+                let success = true;
+
+                const rdmPiece = this.randomTransformPiece(piece);
+                const rdmRow = 4 //random(0, maxSize-1, true);
+                const rdmCol = 4 //random(0, maxSize-1, true);
+                const testBoard = JSON.parse(JSON.stringify(board));
+
+                for(let r=0; r<rdmPiece.length; r++) {
+                    for(let c=0; c<rdmPiece[r].length; c++) {
+                        //ピースにセルがあるか(1かどうか)
+                        if(!rdmPiece[r][c])continue;
+
+                        const boardRow = rdmRow + r;
+                        const boardCol = rdmCol + c;
+
+                        //範囲外の場合
+                        if(boardRow < 0 || boardRow >= maxSize || boardCol < 0 || boardCol >= maxSize) {
+                            success = false;
+                            break;
+                        }
+
+                        if(testBoard[boardRow][boardCol]) {
+                            success = false;
+                            break;
+                        }
+
+                        //ボードにピースを追加
+                        testBoard[boardRow][boardCol] = 1;
+                    }
+                }
+
+                if(success) {
+                    for(let r=0; r<testBoard.length; r++) {
+                        for(let c=0; c<testBoard[r].length; c++) {
+                            if(!testBoard[r][c])continue;
+                            oldCells.push([r,c])
+                        }
+                    }
+                    return testBoard;
+                }
+
+            }
+            
+        }else {
+            let tryCnt = 10000;
+            while(tryCnt > 0) {
+                tryCnt--;
+
+                let success = true;
+
+                const rdmPiece = this.randomTransformPiece(piece);
+
+                const cell = oldCells[random(0, oldCells.length - 1, true)];
+
+                let targetRow = cell[0];
+                let targetCol = cell[1];
+
+                if(random(0,1) > 0.5) {
+                    targetRow += random(0,1,true) ? -1 : 1;
+                } else {
+                    targetCol += random(0,1,true) ? -1 : 1;
+                }
+
+                const pieceCells = [];
+
+                for(let r = 0; r < rdmPiece.length; r++) {
+                    for(let c = 0; c < rdmPiece[r].length; c++) {
+                        if(rdmPiece[r][c]) {
+                            pieceCells.push([r, c]);
+                        }
+                    }
+                }
+
+                const baseCell =
+                    pieceCells[random(0, pieceCells.length - 1, true)];
+
+                const rdmRow = targetRow - baseCell[0];
+                const rdmCol = targetCol - baseCell[1];
+
+                const testBoard = JSON.parse(JSON.stringify(board));
+
+                for(let r = 0; r < rdmPiece.length; r++) {
+                    for(let c = 0; c < rdmPiece[r].length; c++) {
+
+                        if(!rdmPiece[r][c]) continue;
+
+                        const boardRow = rdmRow + r;
+                        const boardCol = rdmCol + c;
+
+                        if(
+                            boardRow < 0 ||
+                            boardRow >= maxSize ||
+                            boardCol < 0 ||
+                            boardCol >= maxSize
+                        ) {
+                            success = false;
+                            break;
+                        }
+
+                        if(testBoard[boardRow][boardCol]) {
+                            success = false;
+                            break;
+                        }
+
+                        testBoard[boardRow][boardCol] = 1;
+                    }
+
+                    if(!success) break;
+                }
+
+                if(success) {
+                    oldCells = [];
+                    for(let r=0; r<testBoard.length; r++) {
+                        for(let c=0; c<testBoard[r].length; c++) {
+                            if(!testBoard[r][c])continue;
+                            oldCells.push([r,c])
+                        }
+                    }
+
+
+                    return testBoard;
+                }
+            }
+        }
+
+    }
+ 
+
+
+
+
+
+
     /**
      * 端の空きセルを取得
      */
@@ -264,218 +420,53 @@ export class ProblemManager {
         return edges;
     }
 
-    static createBoard(piece,difficulty) {
 
-        for(let i=0;i<100;i++) {
-
-            const board =
-                this.tryCreateBoard(
-                    piece,
-                    difficulty
-                );
-
-            // 成功
-            if(board) {
-                return board;
-            }
-
-            console.log("再生成");
-        }
-
-        console.error("board生成失敗");
-
-        return null;
-    }
-
-
-    static tryCreateBoard(piece, difficulty) {
-    const patterns = this.getAllPiecePatterns(piece);
-
-    let pieceCount = 0;
-
-    for (const row of piece) {
-        for (const cell of row) {
-            if (cell === 1) pieceCount++;
-        }
-    }
-
-    const width = piece[0].length + difficulty;
-    const height = piece.length + difficulty;
-
-    const target = Math.floor(width * height * 0.7);
-
-    // ===== ① 安全な初期盤面 =====
-    const board = Array.from({ length: height }, () =>
-        Array(width).fill(0)
-    );
-
-    let filled = 0;
-
-    // ===== ② ランダム配置（制限付き）=====
-    const maxAttempts = width * height * 10;
-
-    for (let i = 0; i < maxAttempts; i++) {
-        const pattern = patterns[random(0, patterns.length - 1, true)];
-
-        const row = random(0, height - 1, true);
-        const col = random(0, width - 1, true);
-
-        const placed = this.placePiece(board, pattern, row, col);
-
-        if (placed) {
-            filled += pieceCount;
-        }
-
-        // 早期終了
-        if (filled >= target) {
-            return board;
-        }
-    }
-
-    // ===== ③ 強制補完（ここが重要）=====
-    this.forceFillBoard(board, patterns, target - filled, pieceCount);
-
-    return board;
-}
-
-
-
-static forceFillBoard(board, patterns, remaining, pieceCount) {
-    const height = board.length;
-    const width = board[0].length;
-
-    let safety = 0;
-
-    while (remaining > 0 && safety < 1000) {
-        safety++;
-
-        const pattern = patterns[random(0, patterns.length - 1, true)];
-        const row = random(0, height - 1, true);
-        const col = random(0, width - 1, true);
-
-        const placed = this.placePiece(board, pattern, row, col);
-
-        if (placed) {
-            remaining -= pieceCount;
-        }
-    }
-
-    // 最終保険（絶対埋める）
-    if (remaining > 0) {
-        for (let i = 0; i < height; i++) {
-            for (let j = 0; j < width; j++) {
-                if (remaining <= 0) return;
-
-                if (board[i][j] === 0) {
-                    board[i][j] = 1;
-                    remaining--;
-                }
-            }
-        }
-    }
-}
-
-
-
-    static placePiece(board,piece,startRow,startCol) {
-
-        // 配置可能判定
-        for(let i=0;i<piece.length;i++) {
-            for(let j=0;j<piece[i].length;j++) {
-
-                if(piece[i][j] !== 1) continue;
-
-                const row = startRow + i;
-                const col = startCol + j;
-
-                // 範囲外
-                if(
-                    row < 0 ||
-                    col < 0 ||
-                    row >= board.length ||
-                    col >= board[0].length
-                ) {
-                    return false;
-                }
-
-                // 重なり
-                if(board[row][col] === 1) {
-                    return false;
-                }
-            }
-        }
-
-        // 実際配置
-        for(let i=0;i<piece.length;i++) {
-            for(let j=0;j<piece[i].length;j++) {
-
-                if(piece[i][j] !== 1) continue;
-
-                const row = startRow + i;
-                const col = startCol + j;
-
-                board[row][col] = 1;
-            }
-        }
-
-        return true;
-    }
-
-    static getAllPiecePatterns(basePiece) {
-
-        const patterns = [];
-
-        let current = basePiece;
-
-        for(let i=0;i<4;i++) {
-
-            // 通常
-            patterns.push(current);
-
-            // 左右反転
-            patterns.push(
-                this.flipPiece(current)
-            );
-
-            // 次回転
-            current =
-                this.rotatePiece(current);
-        }
-
-        return patterns;
-    }
 
     static rotatePiece(piece) {
-
         const rows = piece.length;
         const cols = piece[0].length;
-
         const rotated = [];
 
-        for(let j=0;j<cols;j++) {
+        // 列を見る
+        for(let c = 0; c < cols; c++) {
+            rotated[c] = [];
 
-            const newRow = [];
-
-            for(let i=rows-1;i>=0;i--) {
-                newRow.push(piece[i][j]);
+            // 下から読む
+            for(let r = rows - 1; r >= 0; r--) {
+                rotated[c].push(
+                    piece[r][c]
+                );
             }
-
-            rotated.push(newRow);
         }
 
         return rotated;
     }
 
     static flipPiece(piece) {
+        return piece.map(
+            row => [...row].reverse()
+        );
+    }
 
-        const flipped = [];
+    static randomTransformPiece(piece) {
+        let transformed = piece;
 
-        for(const row of piece) {
-            flipped.push([...row].reverse());
+        // ランダム回転
+        const rotateCount = random(0, 3, true);
+
+        for(let i = 0; i < rotateCount; i++) {
+            transformed = this.rotatePiece(transformed);
         }
 
-        return flipped;
+        // 50%で反転
+        if(random(0, 1, true)) {
+            transformed = this.flipPiece(transformed);
+        }
+
+        return transformed;
     }
+
+
 }
 
 
