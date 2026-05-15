@@ -1,4 +1,4 @@
-const version = [ 0,52 ];
+const version = [ 0,53 ];
 document.getElementById("version").textContent = `ver.${version.join('.')}`;
 
 // 各シーン取得
@@ -100,7 +100,7 @@ function renderBoard() {
 
 
 	//参照ピースを表示
-    exPieceElement.style.gridTemplateColumns = `repeat(${piece[0].length}, 30px)`;
+    exPieceElement.style.gridTemplateColumns = `repeat(${piece[0].length}, 25px)`;
     exPieceElement.innerHTML = "";
 	for (let i = 0; i < piece.length; i++) { //縦
         for (let j = 0; j < piece[i].length; j++) { //横
@@ -122,7 +122,7 @@ function renderBoard() {
 
 
     //ボードの横の長さを調整
-    boardElement.style.gridTemplateColumns = `repeat(${board[0].length}, 35px)`;
+    boardElement.style.gridTemplateColumns = `repeat(${board[0].length}, 30px)`;
     // 一旦中身を空にする
     boardElement.innerHTML = "";
     for (let i = 0; i < board.length; i++) { //縦
