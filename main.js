@@ -69,10 +69,10 @@ let piece; //ベースのピースデータ
 let playerBoard = []; //プレイヤーが塗ったボードデータ
 let playerPiece = []; //プレイヤーが塗ったピースデータ
 let cellElements = []; //セルのエレメントデータ
-let color = "";
-
-let boardIndex = 0;
+let color = ""; //カラー
 let history = []; //履歴のボードデータ
+let boardIndex = 0;
+
 
 
 // シーン切替
@@ -142,6 +142,9 @@ function clear() {
 	for(let i = 0; i < board.length; i++) {
 		cellElements.push(new Array(board.length).fill(0));
 	}
+
+	//履歴を初期化
+	history = []
 
 	renderBoard();
 }
@@ -227,7 +230,7 @@ function moveTouch(e) {
 
 
 //画面タッチを開始
-function startTouch() {
+function startTouch(e) {
 	if(!ingame)return;
 
 	//セルの色を決定
@@ -235,7 +238,7 @@ function startTouch() {
 	//プレイヤーのピースデータを初期化
 	playerPiece = [];
 
-	
+	save(e);
 }
 
 
@@ -292,60 +295,88 @@ function endTouch() {
 }
 
 
+//プレイヤーボードを履歴に保存
+function save(e) {
+	//セルを押したかどうか
+	const element = document.elementFromPoint(e.x, e.y);
+	if(!element)return;
+	if(!element.classList.contains(`cell`))return;
+
+	//座標を取得
+	const row = element.dataset.row;
+	const col = element.dataset.col;
+
+	//ベースのボードと比較、マスが存在するかどうか
+	if(!board[row][col])return;
+	//マスがすでに塗られているか
+	if(playerBoard[row][col])return;
+
+	//プレイヤーボードを保存を履歴に保存
+	const A = JSON.parse(JSON.stringify(playerBoard));
+	history.push(A);
+	console.log(`Save`);
+}
 
 
-
-
-
-
-
-
-
-
-
+//一つ戻す
 function undo() {
-	//indexを一つ戻す
-	console.log(`OldIdx:${boardIndex} >> ${boardIndex-1}`)
-	if(boardIndex - 1 < 0)return;
-	boardIndex--;
+	if(history.length == 0)return;
+
+	const undoBoard = history[history.length-1];
+	playerBoard = undoBoard;
 	
 
-	console.log(`L:${history.length}, In:${boardIndex}`)
+	history.splice(history.length-1, 1);
 
-	const undoBoard = history[boardIndex];
-	filledBoard = JSON.parse(JSON.stringify(undoBoard));
-	// console.log(filledBoard)
-	
+		console.log(history)
+	renderBoard__2();
+}
 
-	for (let i = 0; i < filledBoard.length; i++) { //縦
-        for (let j = 0; j < filledBoard[i].length; j++) { //横
 
-            const cells = document.getElementsByClassName("cell");
-			for(const cell of cells) {
-				if(cell.dataset.row != i || cell.dataset.col != j)continue;
-				if(cell.classList.contains("none"))continue;
+function renderBoard__2() {
+	//セルボードを初期化
+	cellElements = [];
+	for(let i = 0; i < board.length; i++) {
+		cellElements.push(new Array(board.length).fill(0));
+	}
 
-				if(filledBoard[i][j] == 0) {
-					cell.classList.add("empty");
-					cell.classList.remove("filled");
-					cell.style.background = colors.empty
 
-				}else if(filledBoard[i][j] == 1) {
-					cell.classList.remove("empty");
-					cell.classList.add("filled");
-					cell.style.background = colors.filled[0];
-				}else if(filledBoard[i][j] == -2) {
-					cell.classList.remove("empty");
-					cell.classList.add("filled");
-					cell.style.background = colors.out
+	//長さ調節  & リセット
+    boardElement.style.gridTemplateColumns = `repeat(${board[0].length}, 30px)`;
+    boardElement.innerHTML = "";
+
+    for (let i = 0; i < board.length; i++) { //縦
+        for (let j = 0; j < board[i].length; j++) { //横
+            //cellを生成
+            const cell = document.createElement("div");
+            cell.classList.add("cell");
+			cell.dataset.row = i;
+			cell.dataset.col = j;
+
+            //ボードの値によって見た目変更
+			//1: 塗り可能, 0: 虚空
+            if (board[i][j] === 1) {
+				cell.classList.add("empty");
+
+				//セルの状態を取得
+				const res = playerBoard[i][j];
+				//プレイヤーボードの情報をセルに反映
+				if(typeof res == `string`) {
+					cell.style.background = res;
+				}else if(res == -1) {
+					cell.style.background = colors.out;
 				}
-			
-				// console.log(filledBoard[i][j]);
-			} 
+
+			}else cell.classList.add("none");
+            
+
+            // boardに追加
+            boardElement.appendChild(cell);
+			//配列に追加
+			cellElements[i][j] = cell;
         }
     }
 }
-
 
 
 
