@@ -3,7 +3,7 @@ export const colors = {
     empty: "#686762",
 
     filled: [
-        "#ffa653","#ffdbb9",
+        "rgb(255, 197, 142)","#ff893b",
         
         "#ffe240", "#ffeb79",
 

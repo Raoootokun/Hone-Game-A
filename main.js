@@ -4,12 +4,13 @@ import { random } from "./lib/Util.js"
 import { ProblemManager } from "./ProblemManager.js";
 import { checkPiece } from "./checkPiece.js";
 
-const version = [ 0,56 ];
+const version = [ 0, 57 ];
 document.getElementById("version").textContent = `ver.${version.join('.')}`;
 
 // 各シーン取得
 const startScreen = document.getElementById("start-screen");
 const gameScreen = document.getElementById("game-screen");
+const loading = document.getElementById("loading");
 const boardElement  = document.getElementById("board");
 const exPieceElement  = document.getElementById("ex-piece-board");
 
@@ -20,7 +21,6 @@ const nextButton = document.getElementById("next-button");
 const returnButton = document.getElementById("return-button");
 const undoButton = document.getElementById("undo-button");
 const redoButton = document.getElementById("redo-button");
-
 
 
 // STARTボタン
@@ -47,6 +47,10 @@ undoButton.addEventListener("click", () => {
   	undo();
 });
 
+redoButton.addEventListener("click", () => {
+  	redo();
+});
+
 document.addEventListener("pointerdown", (e) => {
 	startTouch(e)
 });
@@ -61,8 +65,6 @@ document.addEventListener(`pointermove`, e => {
 
 
 
-
-
 let ingame = false; //ゲーム中かどうか
 let board; //ベースのボードデータ
 let piece; //ベースのピースデータ
@@ -72,9 +74,8 @@ let cellElements = []; //セルのエレメントデータ
 let color = ""; //カラー
 let history = []; //履歴のボードデータ
 let historyIdx = 0;
-let boardIndex = 0;
 let touchCnt = 0; //画面タッチ開始からのカウント
-
+let volume = false;
 
 // シーン切替
 function transScene(sceneName) {
@@ -85,16 +86,26 @@ function transScene(sceneName) {
 
 	//ホーム表示
 	if (sceneName === "start") {
+		loading.style.display = "none";
+		
 		ingame = false;
 		startScreen.classList.remove("hidden");
+		
 	}
 	//ゲーム開始
-	if (sceneName === "game")start();
+	if (sceneName === "game") {
+		loading.style.display = "flex";
+		volume = document.getElementById("volume-toggle").checked;
+
+		setTimeout(start, 1);
+	}
 }
 
 
 //ゲーム開始に処理
 function start() {
+	loading.style.display = "none";
+
 	gameScreen.classList.remove("hidden");
 	resetButton.classList.remove("hidden");
 	undoButton.classList.remove("hidden");
@@ -109,7 +120,6 @@ function start() {
 	playerBoard = [];
 	playerPiece = [];
 	cellElements = [];
-	boardIndex = 0;
 	history = [];
 	historyIdx = 0;
 
@@ -118,12 +128,6 @@ function start() {
 	for(let i = 0; i < board.length; i++) {
 		playerBoard.push(new Array(board.length).fill(0));
 	}
-
-	//せるボードと同サイズの二次元配列を作成
-	for(let i = 0; i < board.length; i++) {
-		cellElements.push(new Array(board.length).fill(0));
-	}
-
 
 	//見本ピースを表示
 	renderSamplePiece();
@@ -139,14 +143,9 @@ function clear() {
 		playerBoard.push(new Array(board.length).fill(0));
 	}
 
-	//セルボードを初期化
-	cellElements = [];
-	for(let i = 0; i < board.length; i++) {
-		cellElements.push(new Array(board.length).fill(0));
-	}
-
 	//履歴を初期化
-	history = []
+	history = [];
+	historyIdx = 0;
 
 	renderBoard();
 }
@@ -154,6 +153,12 @@ function clear() {
 
 //見本ピースの表示
 function renderSamplePiece() {
+	//セルボードを初期化
+	cellElements = [];
+	for(let i = 0; i < board.length; i++) {
+		cellElements.push(new Array(board.length).fill(0));
+	}
+
 	exPieceElement.style.gridTemplateColumns = `repeat(${piece[0].length}, 25px)`;
     exPieceElement.innerHTML = "";
 
@@ -192,7 +197,18 @@ function renderBoard() {
 
             //ボードの値によって見た目変更
 			//1: 塗り可能, 0: 虚空
-            if (board[i][j] === 1) cell.classList.add("empty");
+            if (board[i][j] === 1) {
+				cell.classList.add("empty");
+
+				//undo,redo時にセルを読み込む用
+				const res = playerBoard[i][j];
+				//プレイヤーボードの情報をセルに反映
+				if(typeof res == `string`) {
+					cell.style.background = res;
+				}else if(res == -1) {
+					cell.style.background = colors.out;
+				}
+			}
             else cell.classList.add("none");
 
             // boardに追加
@@ -257,8 +273,11 @@ function endTouch() {
 
 	if(res) { //正解
 		//サウンド再生
-		const sound = new Audio("./sounds/click.mp3");
-		sound.play();
+		if(volume) {
+			const sound = new Audio("./sounds/click.mp3");
+			sound.play();
+		}
+		
 
 		console.log()
 		//ボードがすべて埋まった場合
@@ -275,9 +294,11 @@ function endTouch() {
 
 	}else { //不正解
 		//サウンド再生
-		const sound = new Audio("./sounds/out.mp3");
-		sound.playbackRate = 3.5;
-		sound.play();
+		if(volume) {
+			const sound = new Audio("./sounds/out.mp3");
+			sound.playbackRate = 3.5;
+			sound.play();
+		}
 
 
 		//セルの色を変更
@@ -298,6 +319,9 @@ function endTouch() {
 
 //プレイヤーボードを履歴に保存
 function save(e) {
+	history.splice(historyIdx, history.length);
+	historyIdx++;
+
 	//セルを押したかどうか
 	const element = document.elementFromPoint(e.x, e.y);
 	if(!element)return;
@@ -313,75 +337,48 @@ function save(e) {
 	if(playerBoard[row][col])return;
 
 	//プレイヤーボードを保存を履歴に保存
-	const A = JSON.parse(JSON.stringify(playerBoard));
-	history.push(A);
-	console.log(`Save`);
+	history.push(JSON.parse(JSON.stringify(playerBoard)));
 }
 
 
 //一つ戻す
 function undo() {
 	if(history.length == 0)return;
+	if(historyIdx == 0)return;
 
-	//ひとつ前のボードをプレイヤーボードに反映
-	const undoBoard = history[history.length-1];
-	playerBoard = undoBoard;
-	
-
-	history.splice(history.length-1, 1);
-
-	console.log(history)
-	renderBoard__2();
-}
-
-
-function renderBoard__2() {
-	//セルボードを初期化
-	cellElements = [];
-	for(let i = 0; i < board.length; i++) {
-		cellElements.push(new Array(board.length).fill(0));
+	//idxが最新の場合
+	//undo前に最新のプレイヤーボードを保存
+	if(historyIdx == history.length) {
+		history.push(JSON.parse(JSON.stringify(playerBoard)));
 	}
 
+	historyIdx--;
 
-	//長さ調節  & リセット
-    boardElement.style.gridTemplateColumns = `repeat(${board[0].length}, 30px)`;
-    boardElement.innerHTML = "";
+	//ひとつ前のボードをプレイヤーボードに反映
+	const undoBoard = history[historyIdx];
+	playerBoard = undoBoard;
 
-    for (let i = 0; i < board.length; i++) { //縦
-        for (let j = 0; j < board[i].length; j++) { //横
-            //cellを生成
-            const cell = document.createElement("div");
-            cell.classList.add("cell");
-			cell.dataset.row = i;
-			cell.dataset.col = j;
-
-            //ボードの値によって見た目変更
-			//1: 塗り可能, 0: 虚空
-            if (board[i][j] === 1) {
-				cell.classList.add("empty");
-
-				//セルの状態を取得
-				const res = playerBoard[i][j];
-				//プレイヤーボードの情報をセルに反映
-				if(typeof res == `string`) {
-					cell.style.background = res;
-				}else if(res == -1) {
-					cell.style.background = colors.out;
-				}
-
-			}else cell.classList.add("none");
-            
-
-            // boardに追加
-            boardElement.appendChild(cell);
-			//配列に追加
-			cellElements[i][j] = cell;
-        }
-    }
+	renderBoard();
 }
+
+
+//一つ進む
+function redo() {
+	if(history.length == 0)return;
+	if(historyIdx + 1 >= history.length)return;
+
+	historyIdx++;
+
+	//ひとつ前のボードをプレイヤーボードに反映
+	const undoBoard = history[historyIdx];
+	playerBoard = undoBoard;
+
+	renderBoard();
+}
+
 
 
 
 // 初期画面
-transScene("game");
+transScene("start");
 console.log(`Ready!\nver.${version.join('.')}`);

@@ -217,7 +217,7 @@ export class ProblemManager {
         }
  
  
-        console.log(oldCells)
+        // console.log(oldCells)
         return board;
     }
 

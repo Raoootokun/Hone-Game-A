@@ -1,0 +1,42 @@
+.switch {
+    transform: translate(40px, 50px);
+
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+    background: gray;
+    border-radius: 34px;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    left: 4px;
+    top: 4px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.2s;
+}
+
+input:checked + .slider {
+    background: limegreen;
+}
+
+input:checked + .slider::before {
+    transform: translateX(26px);
+}
+
+#volume-text {
+    transform: translate(-80px, -12.5px);
+}
