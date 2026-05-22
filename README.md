@@ -1,7 +1,20 @@
 
-- boardリセット
 
-- boardIndexからhistory内のボードを取得
 
-- boardに上書き
-6565656565qwertttttttttttyuiiop-^\[@;]8899
+save
+
+idxをプラス
+idxより上のhistoryを削除
+histroyにプレイヤーボードを保存
+
+
+
+
+
+
+
+
+
+
+
+

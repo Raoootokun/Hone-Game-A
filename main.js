@@ -71,8 +71,9 @@ let playerPiece = []; //プレイヤーが塗ったピースデータ
 let cellElements = []; //セルのエレメントデータ
 let color = ""; //カラー
 let history = []; //履歴のボードデータ
+let historyIdx = 0;
 let boardIndex = 0;
-
+let touchCnt = 0; //画面タッチ開始からのカウント
 
 
 // シーン切替
@@ -110,6 +111,7 @@ function start() {
 	cellElements = [];
 	boardIndex = 0;
 	history = [];
+	historyIdx = 0;
 
 
 	//ベースのボードをプレイヤー用ボードにコピー
@@ -221,6 +223,9 @@ function moveTouch(e) {
 	//マスがすでに塗られているか
 	if(playerBoard[row][col])return;
 
+	if(touchCnt == 0)save(e);
+	touchCnt++;
+
 	playerBoard[row][col] = color;
 	element.style.background = color;
 
@@ -237,14 +242,13 @@ function startTouch(e) {
 	color = colors.filled[random(0, colors.filled.length-1, true)];
 	//プレイヤーのピースデータを初期化
 	playerPiece = [];
-
-	save(e);
 }
 
 
 //画面タッチを終了
 function endTouch() {
 	if(!ingame)return;
+	touchCnt = 0;
 
 	//画面タッチ終了時にピースをチェック
 	if(playerPiece.length == 0)return;
@@ -289,9 +293,6 @@ function endTouch() {
 
 		} 
 	}
-
-
-	
 }
 
 
@@ -322,13 +323,14 @@ function save(e) {
 function undo() {
 	if(history.length == 0)return;
 
+	//ひとつ前のボードをプレイヤーボードに反映
 	const undoBoard = history[history.length-1];
 	playerBoard = undoBoard;
 	
 
 	history.splice(history.length-1, 1);
 
-		console.log(history)
+	console.log(history)
 	renderBoard__2();
 }
 
