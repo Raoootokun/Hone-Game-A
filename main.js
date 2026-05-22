@@ -97,7 +97,7 @@ function transScene(sceneName) {
 		loading.style.display = "flex";
 		volume = document.getElementById("volume-toggle").checked;
 
-		setTimeout(start, 1);
+		setTimeout(start, 10);
 	}
 }
 
