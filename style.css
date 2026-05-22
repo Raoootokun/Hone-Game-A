@@ -50,8 +50,9 @@ body {
 
 
 #text1 {
+    font-size: 25px;
     position: fixed;
-    top: 100px;
+    top: 70px;
     margin: 0;
 }
 
@@ -62,12 +63,12 @@ body {
     bottom: 250px;
     margin: 0;
 
-  display: grid;
-  margin: 0 auto;
-  width: fit-content;
+    display: grid;
+    margin: 0 auto;
+    width: fit-content;
 
-  gap: 4px; /*マスの間隔*/
-  touch-action: none;
+    gap: 4px; /*マスの間隔*/
+    touch-action: none;
 }
 
 
@@ -101,27 +102,27 @@ body {
 
 #ex-piece-board {
     position: fixed;
-    top: 170px;
+    top: 150px;
     margin: 0;
 
-  display: grid;
-  margin: 0 auto;
-  width: fit-content;
+    display: grid;
+    margin: 0 auto;
+    width: fit-content;
 
-  gap: 1px; /*マスの間隔*/
-  touch-action: none;
+    gap: 1px; /*マスの間隔*/
+    touch-action: none;
 }
 .ex-piece {
-  width: 25px;
-  height: 25px;
+    width: 25px;
+    height: 25px;
 }
 .ex-piece-filled {
-  background: #e2e0d4;
-  border: none;
+    background: #e2e0d4;
+    border: none;
 }
 .ex-piece-none {
-  background: transparent;
-  border: none;
+    background: transparent;
+    border: none;
 }
 
 
@@ -146,7 +147,7 @@ body {
     padding: 7px 50px;
     font-size: 30px;
     position: fixed;
-    bottom: 170px;
+    bottom: 110px;
     left: 15%;
     margin: 0;
 }
@@ -155,7 +156,7 @@ body {
     padding: 7px 50px;
     font-size: 30px;
     position: fixed;
-    bottom: 170px;
+    bottom: 110px;
     right: 15%;
     margin: 0;
 }
@@ -163,13 +164,13 @@ body {
 #reset-button {
     padding: 10px 120px;
     position: fixed;
-    bottom: 100px;
+    bottom: 50px;
     margin: 0;
 }
 
 #next-button {
     padding: 10px 120px;
     position: fixed;
-    bottom: 100px;
+    bottom: 50px;
     margin: 0;
 }

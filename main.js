@@ -4,7 +4,7 @@ import { random } from "./lib/Util.js"
 import { ProblemManager } from "./ProblemManager.js";
 import { checkPiece } from "./checkPiece.js";
 
-const version = [ 0,55 ];
+const version = [ 0,56 ];
 document.getElementById("version").textContent = `ver.${version.join('.')}`;
 
 // 各シーン取得
@@ -129,6 +129,7 @@ function start() {
 }
 
 
+//マスをリセット
 function clear() {
 	//プレイヤーボードを初期化
 	playerBoard = [];
