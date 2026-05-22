@@ -20,12 +20,12 @@ body {
 
 #version {
   position: fixed;
-
   top: 10px;
   left: 10px;
 
   margin: 0;
 
+  font-size: 20px;
   color: white;
 }
 
@@ -48,19 +48,20 @@ body {
   display: none;
 }
 
-button {
-  padding: 12px 24px;
 
-  font-size: 18px;
-
-  border: none;
-  border-radius: 8px;
-
-  cursor: pointer;
+#text1 {
+    position: fixed;
+    top: 100px;
+    margin: 0;
 }
 
 
+
 #board {
+    position: fixed;
+    bottom: 250px;
+    margin: 0;
+
   display: grid;
   margin: 0 auto;
   width: fit-content;
@@ -99,6 +100,10 @@ button {
 
 
 #ex-piece-board {
+    position: fixed;
+    top: 170px;
+    margin: 0;
+
   display: grid;
   margin: 0 auto;
   width: fit-content;
@@ -117,4 +122,47 @@ button {
 .ex-piece-none {
   background: transparent;
   border: none;
+}
+
+
+
+.button {
+    padding: 10px 10px;
+    font-size: 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#return-button {
+    font-size: 15px;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    margin: 0;
+}
+
+#undo-button {
+    padding: 7px 50px;
+    font-size: 30px;
+    position: fixed;
+    bottom: 170px;
+    left: 15%;
+    margin: 0;
+}
+
+#redo-button {
+    padding: 7px 50px;
+    font-size: 30px;
+    position: fixed;
+    bottom: 170px;
+    right: 15%;
+    margin: 0;
+}
+
+#reset-button {
+    padding: 10px 120px;
+    position: fixed;
+    bottom: 100px;
+    margin: 0;
 }

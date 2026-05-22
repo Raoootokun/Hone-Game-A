@@ -391,7 +391,13 @@ function normalizeCoords(coords) {
 	return normalized;
 }
 
+
+
+
+
+
+
 // 初期画面
-showScene("start");
+showScene("game");
 console.log(`Ready!\nver.${version.join('.')}`);
 
