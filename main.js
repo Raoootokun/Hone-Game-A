@@ -1,4 +1,4 @@
-const version = [ 0,53 ];
+const version = [ 0,54 ];
 document.getElementById("version").textContent = `ver.${version.join('.')}`;
 
 // 各シーン取得
@@ -12,6 +12,8 @@ const startButton = document.getElementById("start-button");
 const resetButton = document.getElementById("reset-button");
 const nextButton = document.getElementById("next-button");
 const returnButton = document.getElementById("return-button");
+const undoButton = document.getElementById("undo-button");
+const redoButton = document.getElementById("redo-button");
 
 import { datas } from "./datas.js";
 import { colors } from "./colors.js";
@@ -42,6 +44,10 @@ returnButton.addEventListener("click", () => {
   	showScene("start");
 });
 
+undoButton.addEventListener("click", () => {
+  	undo();
+});
+
 
 // シーン切替関数
 function showScene(sceneName) {
@@ -56,6 +62,7 @@ function showScene(sceneName) {
 		startScreen.classList.remove("hidden");
 	}
 
+	//ゲーム開始
 	if (sceneName === "game") {
 		ingame = true;
 		piece = ProblemManager.createPiece(5, 0);
@@ -64,6 +71,8 @@ function showScene(sceneName) {
 
 		gameScreen.classList.remove("hidden");
 		resetButton.classList.remove("hidden");
+		undoButton.classList.remove("hidden");
+		redoButton.classList.remove("hidden");
 
 		renderBoard()
 
@@ -89,9 +98,15 @@ let filledElements = [];
 let filledBoard = [];
 let ingame = false;
 
+let boardIndex = 0;
+let history = [];
 
-function renderBoard() {
-	filledBoard = JSON.parse(JSON.stringify(board));
+function renderBoard(refBoard) {
+	boardIndex = 0;
+	history = [];
+	
+	if(refBoard)filledBoard = refBoard;
+	else filledBoard = JSON.parse(JSON.stringify(board));
 	for (let i = 0; i < filledBoard.length; i++) {
 		for (let j = 0; j < filledBoard[i].length; j++) {
 			filledBoard[i][j] = 0;
@@ -149,6 +164,7 @@ function renderBoard() {
 				const element = document.elementFromPoint(e.x, e.y);
 				if(!element)return;
 
+				// console.log("Move")
 				//虚空マスの場合
 				if(element.classList.contains("none"))return;
 
@@ -159,7 +175,6 @@ function renderBoard() {
 
 					filledPieces.push([element.dataset.row, element.dataset.col]);
 					filledElements.push(element);
-					console.log(`${element.dataset.row}/${element.dataset.col}`)
 
 					const sound = new Audio("./sounds/filled.mp3");
 					sound.currentTime = 0;
@@ -175,20 +190,30 @@ let clearCount = 0;
 let color = "";
 let isDragging = false;
 
-document.addEventListener("pointerdown", () => {
+//画面タッチを開始
+document.addEventListener("pointerdown", (e) => {
 	if(!ingame)return;
+	const element = document.elementFromPoint(e.x, e.y);
+	if(!element)return;
+	if(!element.classList.contains("empty"))return;
+
+	console.log("Down");
+	history.push(JSON.parse(JSON.stringify(filledBoard)));
+	boardIndex++;
 
     filledPieces = [];
     filledElements = [];
     isDragging = true;
 	color = colors.filled[random(0, colors.filled.length-1, true)];
 });
+
+//画面タッチを終了
 document.addEventListener("pointerup", () => {
 	if(!ingame)return;
 
     isDragging = false;
 
-    checkPiece()
+    checkPiece();
 });
 
 
@@ -221,15 +246,17 @@ function checkPiece() {
 		}
 	}
 
+	
+
 	if (same) {
 		for (const data of filledPieces) {
 			filledBoard[data[0]][data[1]] = 1;
 		}
 
-		// console.log("一致！");
-		
 		if(JSON.stringify(filledBoard) === JSON.stringify(board)) {
 			resetButton.classList.add("hidden");
+			undoButton.classList.add("hidden");
+			redoButton.classList.add("hidden");
 			nextButton.classList.remove("hidden");
 
 			document.getElementById("text1").textContent = `CLEAR!!`;
@@ -243,6 +270,10 @@ function checkPiece() {
 		
 	}
 	else {
+		for (const data of filledPieces) {
+			filledBoard[data[0]][data[1]] = -2;
+		}
+
 		//不一致の場合
 		for(const element of filledElements) {
 			element.style.background = colors.out;
@@ -252,6 +283,8 @@ function checkPiece() {
 		sound.playbackRate = 3.5;
 		sound.play();
 	}
+
+	
 }
 
 
@@ -393,7 +426,48 @@ function normalizeCoords(coords) {
 
 
 
+function undo() {
+	//indexを一つ戻す
+	console.log(`OldIdx:${boardIndex} >> ${boardIndex-1}`)
+	if(boardIndex - 1 < 0)return;
+	boardIndex--;
+	
 
+	console.log(`L:${history.length}, In:${boardIndex}`)
+
+	const undoBoard = history[boardIndex];
+	filledBoard = JSON.parse(JSON.stringify(undoBoard));
+	// console.log(filledBoard)
+	
+
+	for (let i = 0; i < filledBoard.length; i++) { //縦
+        for (let j = 0; j < filledBoard[i].length; j++) { //横
+
+            const cells = document.getElementsByClassName("cell");
+			for(const cell of cells) {
+				if(cell.dataset.row != i || cell.dataset.col != j)continue;
+				if(cell.classList.contains("none"))continue;
+
+				if(filledBoard[i][j] == 0) {
+					cell.classList.add("empty");
+					cell.classList.remove("filled");
+					cell.style.background = colors.empty
+
+				}else if(filledBoard[i][j] == 1) {
+					cell.classList.remove("empty");
+					cell.classList.add("filled");
+					cell.style.background = colors.filled[0];
+				}else if(filledBoard[i][j] == -2) {
+					cell.classList.remove("empty");
+					cell.classList.add("filled");
+					cell.style.background = colors.out
+				}
+			
+				// console.log(filledBoard[i][j]);
+			} 
+        }
+    }
+}
 
 
 

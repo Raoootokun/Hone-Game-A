@@ -166,3 +166,10 @@ body {
     bottom: 100px;
     margin: 0;
 }
+
+#next-button {
+    padding: 10px 120px;
+    position: fixed;
+    bottom: 100px;
+    margin: 0;
+}
