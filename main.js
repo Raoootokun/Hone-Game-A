@@ -1,4 +1,10 @@
-const version = [ 0,54 ];
+import { datas } from "./datas.js";
+import { colors } from "./colors.js";
+import { random } from "./lib/Util.js"
+import { ProblemManager } from "./ProblemManager.js";
+import { checkPiece } from "./checkPiece.js";
+
+const version = [ 0,55 ];
 document.getElementById("version").textContent = `ver.${version.join('.')}`;
 
 // 各シーン取得
@@ -15,111 +21,138 @@ const returnButton = document.getElementById("return-button");
 const undoButton = document.getElementById("undo-button");
 const redoButton = document.getElementById("redo-button");
 
-import { datas } from "./datas.js";
-import { colors } from "./colors.js";
-import { random } from "./lib/Util.js"
-import { ProblemManager } from "./ProblemManager.js";
+
 
 // STARTボタン
 startButton.addEventListener("click", () => {
-  	showScene("game");
+  	transScene("game");
 });
-
 
 // RESETボタン
 resetButton.addEventListener("click", () => {
-  	renderBoard()
+  	clear()
 });
-
 
 // NEXTボタン
 nextButton.addEventListener("click", () => {
-  	showScene("game")
-	clearCount++;
+  	transScene("game")
 });
-
 
 // RETURNボタン
 returnButton.addEventListener("click", () => {
-  	showScene("start");
+  	transScene("start");
 });
 
 undoButton.addEventListener("click", () => {
   	undo();
 });
 
+document.addEventListener("pointerdown", (e) => {
+	startTouch(e)
+});
 
-// シーン切替関数
-function showScene(sceneName) {
+document.addEventListener("pointerup", e => {
+	endTouch(e)
+});
+
+document.addEventListener(`pointermove`, e => {
+	moveTouch(e)
+});
+
+
+
+
+
+let ingame = false; //ゲーム中かどうか
+let board; //ベースのボードデータ
+let piece; //ベースのピースデータ
+let playerBoard = []; //プレイヤーが塗ったボードデータ
+let playerPiece = []; //プレイヤーが塗ったピースデータ
+let cellElements = []; //セルのエレメントデータ
+let color = "";
+
+let boardIndex = 0;
+let history = []; //履歴のボードデータ
+
+
+// シーン切替
+function transScene(sceneName) {
 	// 一旦全部隠す
 	startScreen.classList.add("hidden");
 	gameScreen.classList.add("hidden");
 	nextButton.classList.add("hidden");
 
-	// 必要な画面だけ表示
+	//ホーム表示
 	if (sceneName === "start") {
 		ingame = false;
 		startScreen.classList.remove("hidden");
 	}
-
 	//ゲーム開始
-	if (sceneName === "game") {
-		ingame = true;
-		piece = ProblemManager.createPiece(5, 0);
-		board = ProblemManager.createBoard(piece);
-
-
-		gameScreen.classList.remove("hidden");
-		resetButton.classList.remove("hidden");
-		undoButton.classList.remove("hidden");
-		redoButton.classList.remove("hidden");
-
-		renderBoard()
-
-		document.getElementById("text1").textContent = `FIGHT ^^`
-	}
+	if (sceneName === "game")start();
 }
 
 
+//ゲーム開始に処理
+function start() {
+	gameScreen.classList.remove("hidden");
+	resetButton.classList.remove("hidden");
+	undoButton.classList.remove("hidden");
+	redoButton.classList.remove("hidden");
+	document.getElementById("text1").textContent = `FIGHT ^^`
 
 
-
-
-
-
- 
-
-
-let board = datas.board;
-let piece = datas.piece
-
-let filledPieces = [];
-let filledElements = [];
-let filledBoard = [];
-let ingame = false;
-
-let boardIndex = 0;
-let history = [];
-
-function renderBoard(refBoard) {
+	//各要素の初期化 & ピース、ボードの作成
+	ingame = true;
+	piece = ProblemManager.createPiece(5, 0);
+	board = ProblemManager.createBoard(piece);
+	playerBoard = [];
+	playerPiece = [];
+	cellElements = [];
 	boardIndex = 0;
 	history = [];
-	
-	if(refBoard)filledBoard = refBoard;
-	else filledBoard = JSON.parse(JSON.stringify(board));
-	for (let i = 0; i < filledBoard.length; i++) {
-		for (let j = 0; j < filledBoard[i].length; j++) {
-			filledBoard[i][j] = 0;
-		}
+
+
+	//ベースのボードをプレイヤー用ボードにコピー
+	for(let i = 0; i < board.length; i++) {
+		playerBoard.push(new Array(board.length).fill(0));
+	}
+
+	//せるボードと同サイズの二次元配列を作成
+	for(let i = 0; i < board.length; i++) {
+		cellElements.push(new Array(board.length).fill(0));
 	}
 
 
-	//参照ピースを表示
-    exPieceElement.style.gridTemplateColumns = `repeat(${piece[0].length}, 25px)`;
+	//見本ピースを表示
+	renderSamplePiece();
+	renderBoard();
+}
+
+
+function clear() {
+	//プレイヤーボードを初期化
+	playerBoard = [];
+	for(let i = 0; i < board.length; i++) {
+		playerBoard.push(new Array(board.length).fill(0));
+	}
+
+	//セルボードを初期化
+	cellElements = [];
+	for(let i = 0; i < board.length; i++) {
+		cellElements.push(new Array(board.length).fill(0));
+	}
+
+	renderBoard();
+}
+
+
+//見本ピースの表示
+function renderSamplePiece() {
+	exPieceElement.style.gridTemplateColumns = `repeat(${piece[0].length}, 25px)`;
     exPieceElement.innerHTML = "";
+
 	for (let i = 0; i < piece.length; i++) { //縦
         for (let j = 0; j < piece[i].length; j++) { //横
-
             // div生成
             const cell = document.createElement("div");
 
@@ -134,126 +167,95 @@ function renderBoard(refBoard) {
             exPieceElement.appendChild(cell);
         }
     }
+}
 
 
-    //ボードの横の長さを調整
+//ボードを表示
+function renderBoard() {
+	//長さ調節  & リセット
     boardElement.style.gridTemplateColumns = `repeat(${board[0].length}, 30px)`;
-    // 一旦中身を空にする
     boardElement.innerHTML = "";
+
     for (let i = 0; i < board.length; i++) { //縦
         for (let j = 0; j < board[i].length; j++) { //横
-
-            // div生成
+            //cellを生成
             const cell = document.createElement("div");
-
-            // 共通クラス
             cell.classList.add("cell");
 			cell.dataset.row = i;
 			cell.dataset.col = j;
 
-            // 値によって見た目変更
+            //ボードの値によって見た目変更
+			//1: 塗り可能, 0: 虚空
             if (board[i][j] === 1) cell.classList.add("empty");
             else cell.classList.add("none");
 
             // boardに追加
             boardElement.appendChild(cell);
-
-			//mousemove
-			//pointerenter
-            cell.addEventListener("pointermove", (e) => { //押したら
-				const element = document.elementFromPoint(e.x, e.y);
-				if(!element)return;
-
-				// console.log("Move")
-				//虚空マスの場合
-				if(element.classList.contains("none"))return;
-
-				if(element.classList.contains("empty")) {
-					element.classList.add("filled");
-					element.classList.remove("empty");
-					element.style.background = color;
-
-					filledPieces.push([element.dataset.row, element.dataset.col]);
-					filledElements.push(element);
-
-					const sound = new Audio("./sounds/filled.mp3");
-					sound.currentTime = 0;
-					// sound.play();
-				}
-            });
+			//配列に追加
+			cellElements[i][j] = cell;
         }
     }
 }
 
 
-let clearCount = 0;
-let color = "";
-let isDragging = false;
-
-//画面タッチを開始
-document.addEventListener("pointerdown", (e) => {
+//マスを塗る
+function moveTouch(e) {
 	if(!ingame)return;
+	
+	//動かした座標のエレメントを取得
 	const element = document.elementFromPoint(e.x, e.y);
 	if(!element)return;
-	if(!element.classList.contains("empty"))return;
+	if(!element.classList.contains(`cell`))return;
 
-	console.log("Down");
-	history.push(JSON.parse(JSON.stringify(filledBoard)));
-	boardIndex++;
+	//座標を取得
+	const row = element.dataset.row;
+	const col = element.dataset.col;
 
-    filledPieces = [];
-    filledElements = [];
-    isDragging = true;
-	color = colors.filled[random(0, colors.filled.length-1, true)];
-});
+	//ベースのボードと比較、マスがあるかどうか
+	if(!board[row][col])return;
 
-//画面タッチを終了
-document.addEventListener("pointerup", () => {
+	//マスがすでに塗られているか
+	if(playerBoard[row][col])return;
+
+	playerBoard[row][col] = color;
+	element.style.background = color;
+
+	//塗った座標を保存
+	playerPiece.push([row, col]);
+}
+
+
+//画面タッチを開始
+function startTouch() {
 	if(!ingame)return;
 
-    isDragging = false;
-
-    checkPiece();
-});
-
-
-
-// ======================
-// piece判定
-// ======================
-function checkPiece() {
-	// player側
-	const normalizedPlayer =normalizeCoords(filledPieces);
-	// pieceの全パターン取得
-	const piecePatterns =getAllPiecePatterns(piece);
-	if(normalizedPlayer.length == 0)return;
-
-	let same = false;
-	// 全パターン比較
-	for (const pattern of piecePatterns) {
-		const normalizedPattern = normalizeCoords(pieceToCoords(pattern));
-
-		// 一致判定
-		if (
-		JSON.stringify(normalizedPlayer)
-		===
-		JSON.stringify(normalizedPattern)
-		) {
-
-		same = true;
-		break;
-
-		}
-	}
+	//セルの色を決定
+	color = colors.filled[random(0, colors.filled.length-1, true)];
+	//プレイヤーのピースデータを初期化
+	playerPiece = [];
 
 	
+}
 
-	if (same) {
-		for (const data of filledPieces) {
-			filledBoard[data[0]][data[1]] = 1;
-		}
 
-		if(JSON.stringify(filledBoard) === JSON.stringify(board)) {
+//画面タッチを終了
+function endTouch() {
+	if(!ingame)return;
+
+	//画面タッチ終了時にピースをチェック
+	if(playerPiece.length == 0)return;
+    const res = checkPiece(piece, playerPiece);
+
+
+	if(res) { //正解
+		//サウンド再生
+		const sound = new Audio("./sounds/click.mp3");
+		sound.play();
+
+		console.log()
+		//ボードがすべて埋まった場合
+		const ok = JSON.stringify(playerBoard.map(a => a.map(a => { return (a != 1 && a != 0) ? 1:0; }))) === JSON.stringify(board);
+		if(ok) {
 			resetButton.classList.add("hidden");
 			undoButton.classList.add("hidden");
 			redoButton.classList.add("hidden");
@@ -262,167 +264,41 @@ function checkPiece() {
 			document.getElementById("text1").textContent = `CLEAR!!`;
 			ingame = false;
 		}
-		
-		const sound = new Audio("./sounds/click.mp3");
-		sound.play();
 
-
-		
-	}
-	else {
-		for (const data of filledPieces) {
-			filledBoard[data[0]][data[1]] = -2;
-		}
-
-		//不一致の場合
-		for(const element of filledElements) {
-			element.style.background = colors.out;
-		}
-		
+	}else { //不正解
+		//サウンド再生
 		const sound = new Audio("./sounds/out.mp3");
 		sound.playbackRate = 3.5;
 		sound.play();
+
+
+		//セルの色を変更
+		for (let i = 0; i < playerPiece.length; i++) {
+			const row = playerPiece[i][0];
+			const col = playerPiece[i][1];
+
+			const cell = cellElements[row][col];
+			if(cell.dataset.row == row && cell.dataset.col == col) {
+				cell.style.background = colors.out;
+				playerBoard[row][col] = -1;
+			}
+
+		} 
 	}
+
 
 	
 }
 
 
-// ======================
-// pieceの全パターン
-// ======================
-
-function getAllPiecePatterns(basePiece) {
-	const patterns = [];
-
-	let current = basePiece;
 
 
-	// 4回転
-	for (let i = 0; i < 4; i++) {
-
-		// 通常
-		patterns.push(current);
-
-		// 左右反転
-		patterns.push(flipPiece(current));
-
-		// 次の回転
-		current = rotatePiece(current);
-	}
 
 
-	return patterns;
-}
 
 
-// ======================
-// 90°回転
-// ======================
-
-function rotatePiece(pieceData) {
-	const rows = pieceData.length;
-	const cols = pieceData[0].length;
-
-	const rotated = [];
 
 
-	for (let j = 0; j < cols; j++) {
-
-		const newRow = [];
-
-		for (let i = rows - 1; i >= 0; i--) {
-
-		newRow.push(pieceData[i][j]);
-
-		}
-
-		rotated.push(newRow);
-	}
-
-
-	return rotated;
-}
-
-
-// ======================
-// 左右反転
-// ======================
-function flipPiece(pieceData) {
-	const flipped = [];
-
-	for (const row of pieceData) {
-
-		flipped.push(
-		[...row].reverse()
-		);
-
-	}
-
-
-	return flipped;
-}
-
-
-// ======================
-// piece → 座標変換
-// ======================
-
-function pieceToCoords(pieceData) {
-	const coords = [];
-
-	for (let i = 0; i < pieceData.length; i++) {
-
-		for (let j = 0; j < pieceData[i].length; j++) {
-
-		if (pieceData[i][j] === 1) {
-
-			coords.push([i, j]);
-
-		}
-		}
-	}
-
-	return coords;
-}
-
-
-// ======================
-// 左上基準へ変換
-// ======================
-function normalizeCoords(coords) {
-	let minRow = Infinity;
-	let minCol = Infinity;
-
-
-	// 最小座標取得
-	for (const [row, col] of coords) {
-
-		if (row < minRow) minRow = row;
-		if (col < minCol) minCol = col;
-
-	}
-
-
-	// 左上基準へ変換
-	const normalized = [];
-
-
-	for (const [row, col] of coords) {
-
-		normalized.push([
-		row - minRow,
-		col - minCol
-		]);
-
-	}
-
-
-	// ソート
-	normalized.sort();
-
-	return normalized;
-}
 
 
 
@@ -471,7 +347,7 @@ function undo() {
 
 
 
-// 初期画面
-showScene("game");
-console.log(`Ready!\nver.${version.join('.')}`);
 
+// 初期画面
+transScene("game");
+console.log(`Ready!\nver.${version.join('.')}`);
