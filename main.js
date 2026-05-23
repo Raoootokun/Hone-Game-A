@@ -3,8 +3,10 @@ import { colors } from "./colors.js";
 import { random } from "./lib/Util.js"
 import { ProblemManager } from "./ProblemManager.js";
 import { checkPiece } from "./checkPiece.js";
+import { Piece } from "./Piece.js";
+import { Board } from "./Board.js";
 
-const version = [ 0, 57 ];
+const version = [ 0, 58 ];
 document.getElementById("version").textContent = `ver.${version.join('.')}`;
 
 // 各シーン取得
@@ -21,6 +23,21 @@ const nextButton = document.getElementById("next-button");
 const returnButton = document.getElementById("return-button");
 const undoButton = document.getElementById("undo-button");
 const redoButton = document.getElementById("redo-button");
+
+
+
+let ingame = false; //ゲーム中かどうか
+let board; //ベースのボードデータ
+let piece; //ベースのピースデータ
+let playerBoard = []; //プレイヤーが塗ったボードデータ
+let playerPiece = []; //プレイヤーが塗ったピースデータ
+let cellElements = []; //セルのエレメントデータ
+let color = ""; //カラー
+let history = []; //履歴のボードデータ
+let historyIdx = 0;
+let touchCnt = 0; //画面タッチ開始からのカウント
+let volume = false;
+
 
 
 // STARTボタン
@@ -65,18 +82,6 @@ document.addEventListener(`pointermove`, e => {
 
 
 
-let ingame = false; //ゲーム中かどうか
-let board; //ベースのボードデータ
-let piece; //ベースのピースデータ
-let playerBoard = []; //プレイヤーが塗ったボードデータ
-let playerPiece = []; //プレイヤーが塗ったピースデータ
-let cellElements = []; //セルのエレメントデータ
-let color = ""; //カラー
-let history = []; //履歴のボードデータ
-let historyIdx = 0;
-let touchCnt = 0; //画面タッチ開始からのカウント
-let volume = false;
-
 // シーン切替
 function transScene(sceneName) {
 	// 一旦全部隠す
@@ -115,8 +120,8 @@ function start() {
 
 	//各要素の初期化 & ピース、ボードの作成
 	ingame = true;
-	piece = ProblemManager.createPiece(5, 0);
-	board = ProblemManager.createBoard(piece);
+	piece = Piece.create(5);
+	board = Board.create(); //ProblemManager.createBoard(piece);
 	playerBoard = [];
 	playerPiece = [];
 	cellElements = [];
@@ -380,5 +385,5 @@ function redo() {
 
 
 // 初期画面
-transScene("start");
+transScene("game");
 console.log(`Ready!\nver.${version.join('.')}`);

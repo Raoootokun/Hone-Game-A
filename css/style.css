@@ -60,7 +60,7 @@ body {
 
 #board {
     position: fixed;
-    bottom: 250px;
+    bottom: 190px;
     margin: 0;
 
     display: grid;
