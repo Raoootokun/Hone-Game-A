@@ -7,8 +7,8 @@ const dires = [
     [0, 1], //右
 ];
 
-const maxHeight = 12;
-const maxWidth = 12;
+const maxHeight = 11;
+const maxWidth = 11;
 
 export class Board {
     static create() {

@@ -6,7 +6,7 @@ import { checkPiece } from "./checkPiece.js";
 import { Piece } from "./Piece.js";
 import { Board } from "./Board.js";
 
-const version = [0, 59, 0];
+const version = [0, 59, 1];
 document.getElementById("version").textContent = `ver.${version.join(".")}`;
 
 // 各シーン取得
@@ -108,7 +108,6 @@ function start() {
     resetButton.classList.remove("hidden");
     undoButton.classList.remove("hidden");
     redoButton.classList.remove("hidden");
-    document.getElementById("text1").textContent = `FIGHT ^^`;
 
     //各要素の初期化 & ピース、ボードの作成
     ingame = true;
@@ -309,8 +308,6 @@ function endTouch() {
             undoButton.classList.add("hidden");
             redoButton.classList.add("hidden");
             nextButton.classList.remove("hidden");
-
-            document.getElementById("text1").textContent = `CLEAR!!`;
             ingame = false;
         }
     } else {
