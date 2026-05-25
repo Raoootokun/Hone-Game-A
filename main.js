@@ -1,12 +1,11 @@
 import { datas } from "./datas.js";
 import { colors } from "./colors.js";
 import { random } from "./lib/Util.js";
-import { ProblemManager } from "./ProblemManager.js";
 import { checkPiece } from "./checkPiece.js";
 import { Piece } from "./Piece.js";
 import { Board } from "./Board.js";
 
-const version = [0, 59, 1];
+const version = [0, 59, 10];
 document.getElementById("version").textContent = `ver.${version.join(".")}`;
 
 // 各シーン取得
@@ -109,10 +108,8 @@ function start() {
     undoButton.classList.remove("hidden");
     redoButton.classList.remove("hidden");
 
-    //各要素の初期化 & ピース、ボードの作成
+    //各要素の初期化
     ingame = true;
-    pieces = []; // piece = Piece.create(5);
-    board = Board.create(); //ProblemManager.createBoard(piece);
     playerBoard = [];
     playerPiece = [];
     cellElements = [];
@@ -120,10 +117,14 @@ function start() {
     historyIdx = 0;
 
     //ピースを作成
-    const cnt = random(1, 3, true);
+    pieces = [];
+    const cnt = random(2, 3, true);
     for (let i = 0; i < cnt; i++) {
-        pieces.push(Piece.create(5));
+        pieces.push(Piece.create(7));
     }
+
+    //ボードを作成
+    board = Board.create(pieces);
 
     //ベースのボードをプレイヤー用ボードにコピー
     for (let i = 0; i < board.length; i++) {
@@ -140,8 +141,6 @@ function start() {
     renderSamplePiece();
     //ボードを表示
     renderBoard();
-
-    console.log(cellElements);
 }
 
 //マスをリセット

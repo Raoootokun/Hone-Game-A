@@ -10,7 +10,7 @@ const dires = [
 export class Piece {
     static create(maxSize) {
         //サイズを決定
-        const size = random(maxSize - 2, maxSize, true);
+        const size = random(2, maxSize, true);
         let piece = [];
 
         //空の二次元配列を作成

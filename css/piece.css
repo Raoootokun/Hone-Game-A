@@ -13,7 +13,7 @@
 
 #piece-container {
     position: fixed;
-    top: 130px;
+    top: 100px;
 
     display: flex;
     gap: 30px;
