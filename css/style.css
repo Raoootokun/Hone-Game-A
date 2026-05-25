@@ -100,30 +100,7 @@ body {
 }
 
 
-#ex-piece-board {
-    position: fixed;
-    top: 150px;
-    margin: 0;
 
-    display: grid;
-    margin: 0 auto;
-    width: fit-content;
-
-    gap: 1px; /*マスの間隔*/
-    touch-action: none;
-}
-.ex-piece {
-    width: 25px;
-    height: 25px;
-}
-.ex-piece-filled {
-    background: #e2e0d4;
-    border: none;
-}
-.ex-piece-none {
-    background: transparent;
-    border: none;
-}
 
 
 
