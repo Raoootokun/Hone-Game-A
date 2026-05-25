@@ -2,7 +2,6 @@
 // piece判定
 // ======================
 export function checkPiece(pieces, playerPiece) {
-    console.log(`aaaaaaaaaaa`);
     // player側
     const normalizedPlayer = normalizeCoords(
         JSON.parse(JSON.stringify(playerPiece)),

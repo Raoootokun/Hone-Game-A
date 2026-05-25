@@ -48,43 +48,6 @@ body {
     display: none;
 }
 
-#board {
-    position: fixed;
-    bottom: 190px;
-    margin: 0;
-
-    display: grid;
-    margin: 0 auto;
-    width: fit-content;
-
-    gap: 4px; /*マスの間隔*/
-    touch-action: none;
-}
-
-.cell {
-    width: 30px;
-    height: 30px;
-
-    /* border: 1px solid #444; */
-}
-
-/* 表示するマス */
-.filled {
-    background: #fff787;
-    border: none;
-}
-
-.empty {
-    background: #686762;
-    border: none;
-}
-
-/* 虚空マス */
-.none {
-    background: transparent;
-    border: none;
-}
-
 #loading {
     position: fixed;
     inset: 0;

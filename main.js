@@ -1,11 +1,11 @@
 import { datas } from "./datas.js";
-import { colors } from "./colors.js";
+import { Color } from "./Color.js";
 import { random } from "./lib/Util.js";
 import { checkPiece } from "./checkPiece.js";
 import { Piece } from "./Piece.js";
 import { Board } from "./Board.js";
 
-const version = [0, 59, 10];
+const version = [0, 59, 20];
 document.getElementById("version").textContent = `ver.${version.join(".")}`;
 
 // 各シーン取得
@@ -120,7 +120,7 @@ function start() {
     pieces = [];
     const cnt = random(2, 3, true);
     for (let i = 0; i < cnt; i++) {
-        pieces.push(Piece.create(7));
+        pieces.push(Piece.create(6));
     }
 
     //ボードを作成
@@ -216,15 +216,22 @@ function renderBoard() {
             //ボードの値によって見た目変更
             //1: 塗り可能, 0: 虚空
             if (board[i][j] === 1) {
-                cell.classList.add("empty");
+                cell.classList.add("any");
 
                 //undo,redo時にセルを読み込む用
                 const res = playerBoard[i][j];
                 //プレイヤーボードの情報をセルに反映
                 if (typeof res == `string`) {
                     cell.style.background = res;
+
+                    const test = document.createElement("div");
+                    test.classList.add("test");
+                    test.style.background = res;
+                    cell.appendChild(test);
+
+                    renderBorder([i, j], test);
                 } else if (res == -1) {
-                    cell.style.background = colors.out;
+                    cell.style.background = Color.out;
                 }
             } else cell.classList.add("none");
 
@@ -270,7 +277,9 @@ function startTouch(e) {
     if (!ingame) return;
 
     //セルの色を決定
-    color = colors.filled[random(0, colors.filled.length - 1, true)];
+    // color = Color.filleds[random(0, Color.filleds.length - 1, true)];
+    color = Color.getRandom();
+
     //プレイヤーのピースデータを初期化
     playerPiece = [];
 }
@@ -282,6 +291,7 @@ function endTouch() {
 
     //画面タッチ終了時にピースをチェック
     if (playerPiece.length == 0) return;
+
     const res = checkPiece(pieces, playerPiece);
 
     if (res) {
@@ -290,6 +300,17 @@ function endTouch() {
         if (volume) {
             const sound = new Audio("./sounds/click.mp3");
             sound.play();
+        }
+
+        for (const piece of playerPiece) {
+            const element = cellElements[piece[0]][piece[1]];
+
+            const test = document.createElement("div");
+            test.classList.add("test");
+            test.style.background = color;
+            element.appendChild(test);
+
+            renderBorder(piece, test);
         }
 
         console.log();
@@ -325,7 +346,7 @@ function endTouch() {
 
             const cell = cellElements[row][col];
             if (cell.dataset.row == row && cell.dataset.col == col) {
-                cell.style.background = colors.out;
+                cell.style.background = Color.out;
                 playerBoard[row][col] = -1;
             }
         }
@@ -392,3 +413,39 @@ function redo() {
 // 初期画面
 transScene("game");
 console.log(`Ready!\nver.${version.join(".")}`);
+
+function renderBorder([row, col], element) {
+    const color = playerBoard[row][col];
+
+    const dires = [
+        [-1, 0, "Top"],
+        [1, 0, "Bottom"],
+        [0, -1, "Left"],
+        [0, 1, "Right"],
+    ];
+
+    //各ピース上下左右をチェック
+    for (const [direRow, direCol, dire] of dires) {
+        //各向きを追加した座標
+        const neRow = 1 * row + direRow;
+        const neCol = 1 * col + direCol;
+
+        //範囲外の場合
+        if (
+            playerBoard[neRow] === undefined ||
+            playerBoard[neRow][neCol] === undefined
+        ) {
+            element.style[`border${dire}`] = "3px solid #e0e0e0";
+
+            continue;
+        }
+
+        //隣接しているか
+        const isConnected = playerBoard[neRow][neCol] === color;
+
+        //どこにも隣接していない場合
+        if (!isConnected) {
+            element.style[`border${dire}`] = "3px solid #e0e0e0";
+        }
+    }
+}

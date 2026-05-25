@@ -1,34 +1,38 @@
-.sample-piece {
-    width: 20px;
-    height: 20px;
+#board {
+    position: fixed;
+    bottom: 190px;
+    margin: 0;
+
+    display: grid;
+    margin: 0 auto;
+    width: fit-content;
+
+    gap: 4px; /*マスの間隔*/
+    touch-action: none;
 }
-.sample-piece-filled {
-    background: #e2e0d4;
+
+.cell {
+    width: 30px;
+    height: 30px;
+}
+
+.any {
+    background: #686762;
     border: none;
 }
-.sample-piece-none {
+
+/* 虚空マス */
+.none {
     background: transparent;
     border: none;
 }
 
-#piece-container {
-    position: fixed;
-    top: 100px;
+.test {
+    width: 34.5px;
+    height: 34.5px;
+    box-sizing: border-box;
 
-    display: flex;
-    gap: 30px;
-
-    justify-content: center;
-    align-items: center;
-}
-
-.piece-board {
-    margin: 0;
-
-    display: grid;
-    margin: 0;
-    width: fit-content;
-
-    gap: 1px; /*マスの間隔*/
-    touch-action: none;
+    position: relative;
+    top: -1.5px;
+    left: -1.5px;
 }
