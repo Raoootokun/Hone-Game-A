@@ -11,7 +11,13 @@ const maxSize = 11;
 let pieceCnt = 0;
 
 export class Board {
-    static create(pieces) {
+    constructor() {
+    }
+
+    //ボードを作成
+    create(pieces, difficulty) {
+        this.difficulty = difficulty;
+
         pieceCnt = 0;
 
         let board = [];
@@ -25,7 +31,8 @@ export class Board {
 
         //中心に配置
         board = place1(board, pieces, placeHistory);
-        board = place2(board, pieces, placeHistory);
+        board = place2(board, pieces, placeHistory, this.difficulty);
+        board = deleteZeroLine(board);
 
         return board;
     }
@@ -84,7 +91,9 @@ function place1(board, pieces, placeHistory) {
  * 設置履歴の隣に設置
  * 設置後に設置履歴から削除
  */
-function place2(board, pieces, placeHistory) {
+function place2(board, pieces, placeHistory, difficulty) {
+    const maxPieceCount = getMaxPieceCount(difficulty);
+
     //一定回数以上を超えるとストップ
     for (let tryCnt = 0; tryCnt < 100; tryCnt++) {
         if (placeHistory.length == 0) return board;
@@ -102,8 +111,8 @@ function place2(board, pieces, placeHistory) {
         //各方向に設置を試みる
         for (let __i = 0; __i < 4; __i++) {
             const dire = dires[__i];
-            const startRow = rdmRow + dire[0];
-            const startCol = rdmCol + dire[1];
+            const startRow = rdmRow + dire[0] + (pieceCnt == 0 ? 2 : 0);
+            const startCol = rdmCol + dire[1] + (pieceCnt == 0 ? 2 : 0);
 
             //範囲外の場合
             if (!checkVolume(maxSize, startRow, startCol)) continue;
@@ -124,7 +133,9 @@ function place2(board, pieces, placeHistory) {
 
                 //反転させる
                 for (const flip of filps) {
-                    if(pieceCnt > 10)return board;
+                    if(difficulty == 1 && maxPieceCount - 2 < pieceCnt)return board;
+                    if(difficulty == 2 && maxPieceCount - 2 < pieceCnt)return board;
+                    if(difficulty == 3 && maxPieceCount - 2 < pieceCnt)return board;
 
                     if (flip) piece = flipPiece(piece);
 
@@ -155,6 +166,23 @@ function place2(board, pieces, placeHistory) {
     }
 
     return board;
+}
+
+/*
+ * すべて0の行列を削除
+ */
+function deleteZeroLine(board) {
+    const board_ = board.filter((row) => {
+        return row.some((col) => col === 1);
+    });
+
+    const board__ = board_.map((row) =>
+        row.filter((_, colIndex) => {
+            return board_.some((r) => r[colIndex] === 1);
+        }),
+    );
+
+    return board__;
 }
 
 /**
@@ -277,4 +305,10 @@ function rotatePiece(piece) {
     }
 
     return rotated;
+}
+
+function getMaxPieceCount(difficulty) {
+    if(difficulty == 1)return random(3, 5, true);
+    if(difficulty == 2)return random(7, 10, true);
+    if(difficulty == 3)return random(15, 30, true);
 }

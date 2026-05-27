@@ -1,4 +1,3 @@
-import { datas } from "./datas.js";
 import { Color } from "./Color.js";
 import { random } from "./lib/Util.js";
 import { checkPiece } from "./checkPiece.js";
@@ -145,7 +144,8 @@ function start() {
     }
 
     //ボードを作成
-    board = Board.create(pieces);
+    const boardManager = new Board();
+    board = boardManager.create(pieces, 2);
 
     //ベースのボードをプレイヤー用ボードにコピー
     for (let i = 0; i < board.length; i++) {
@@ -267,6 +267,8 @@ function renderBoard() {
 //マスを塗る
 function moveTouch(e) {
     if (!ingame) return;
+    //消しゴムモードの場合
+    if(mode == "era")return;
 
     //動かした座標のエレメントを取得
     const element = document.elementFromPoint(e.x, e.y);
@@ -296,19 +298,40 @@ function moveTouch(e) {
 //画面タッチを開始
 function startTouch(e) {
     if (!ingame) return;
+        
+    if(mode == "pen") {
+        //セルの色を決定
+        // color = Color.filleds[random(0, Color.filleds.length - 1, true)];
+        color = Color.getRandom();
 
-    //セルの色を決定
-    // color = Color.filleds[random(0, Color.filleds.length - 1, true)];
-    color = Color.getRandom();
+        //プレイヤーのピースデータを初期化
+        playerPiece = [];
+    }else if(mode == "era") {
+        //動かした座標のエレメントを取得
+        for(const element of document.elementsFromPoint(e.clientX, e.clientY)) {
+            if (!element.classList.contains(`cell`)) continue;
 
-    //プレイヤーのピースデータを初期化
-    playerPiece = [];
+            //座標を取得
+            const row = element.dataset.row;
+            const col = element.dataset.col;
+
+            //ベースのボードと比較、マスがあるかどうか
+            if (!board[row][col]) continue;
+            //マスが空白の場合
+            if (!playerBoard[row][col]) continue;
+
+            //状態を取得
+            const state = playerBoard[row][col];
+            console.log(state)
+        }
+    }
 }
 
 //画面タッチを終了
 function endTouch() {
     if (!ingame) return;
     touchCnt = 0;
+    if(mode == "era")return;
 
     //画面タッチ終了時にピースをチェック
     if (playerPiece.length == 0) return;
@@ -478,4 +501,13 @@ function renderBorder([row, col], element) {
             element.style[`border${dire}`] = "3px solid #e0e0e0";
         }
     }
+}
+
+
+class Eraser {
+    //タッチ開始
+    static start() {
+        
+    }
+
 }
