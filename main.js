@@ -4,7 +4,7 @@ import { checkPiece } from "./checkPiece.js";
 import { Piece } from "./Piece.js";
 import { Board } from "./Board.js";
 
-const version = [0, 60, 1];
+const version = [0, 60, 2];
 document.getElementById("version").textContent = `ver.${version.join(".")}`;
 
 // 各シーン取得
@@ -357,6 +357,7 @@ function endTouch() {
         //正解
         //サウンド再生
         if (volume) {
+            soundOK.currentTime = 0;
             soundOK.playbackRate = 1.5;
             soundOK.play();
         }
