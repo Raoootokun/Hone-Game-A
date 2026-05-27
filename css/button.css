@@ -55,7 +55,6 @@ button:active {
 }
 
 #next-button {
-    color: black;
     width: 75vw;
     height: 10vw;
     position: fixed;

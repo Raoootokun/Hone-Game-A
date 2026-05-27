@@ -8,9 +8,12 @@ const dires = [
 ];
 
 const maxSize = 11;
+let pieceCnt = 0;
 
 export class Board {
     static create(pieces) {
+        pieceCnt = 0;
+
         let board = [];
 
         //空の二次元配列を作成
@@ -121,6 +124,8 @@ function place2(board, pieces, placeHistory) {
 
                 //反転させる
                 for (const flip of filps) {
+                    if(pieceCnt > 10)return board;
+
                     if (flip) piece = flipPiece(piece);
 
                     //設置成功
@@ -128,6 +133,7 @@ function place2(board, pieces, placeHistory) {
                     if (res != false) {
                         board = res; //ボードを上書き
                         placed = true;
+                        pieceCnt++;
 
                         //設置した座標を記録
                         piece.forEach((row, i) =>

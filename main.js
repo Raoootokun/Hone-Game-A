@@ -5,7 +5,7 @@ import { checkPiece } from "./checkPiece.js";
 import { Piece } from "./Piece.js";
 import { Board } from "./Board.js";
 
-const version = [0, 59, 22];
+const version = [0, 59, 23];
 document.getElementById("version").textContent = `ver.${version.join(".")}`;
 
 // 各シーン取得
@@ -323,6 +323,7 @@ function endTouch() {
             sound.play();
         }
 
+        //正解したピースにボーダーを表示
         for (const piece of playerPiece) {
             const element = cellElements[piece[0]][piece[1]];
 
@@ -334,7 +335,6 @@ function endTouch() {
             renderBorder(piece, test);
         }
 
-        console.log();
         //ボードがすべて埋まった場合
         const ok =
             JSON.stringify(
@@ -429,6 +429,15 @@ function redo() {
     playerBoard = undoBoard;
 
     renderBoard();
+}
+
+//識別IDを作成
+function createId() {
+    let id = ``;
+    for(let i=0; i<5; i++) {
+        id += `${random(0, 9, true)}`;
+    }
+    return id;
 }
 
 // 初期画面
