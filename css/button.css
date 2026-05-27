@@ -7,41 +7,59 @@
 }
 
 #return-button {
-    font-size: 15px;
+    font-size: 100%;
     position: fixed;
-    top: 10px;
-    right: 10px;
+    top: 1%;
+    right: 2%;
     margin: 0;
 }
 
 #undo-button {
-    padding: 7px 50px;
-    font-size: 30px;
+    color: black;
+    font-size: 300%;
+    line-height: 0;
+    width: 35vw;
+    height: 10vw;
     position: fixed;
-    bottom: 110px;
-    left: 15%;
+    transform: translateX(-70%);
+    bottom: 10vh;
     margin: 0;
 }
 
 #redo-button {
-    padding: 7px 50px;
-    font-size: 30px;
+    color: black;
+    font-size: 300%;
+    line-height: 0;
+    width: 35vw;
+    height: 10vw;
     position: fixed;
-    bottom: 110px;
-    right: 15%;
+    transform: translateX(70%);
+    bottom: 10vh;
     margin: 0;
 }
 
 #reset-button {
-    padding: 10px 120px;
+    width: 35vw;
+    height: 10vw;
     position: fixed;
-    bottom: 50px;
+    transform: translateX(-70%);
+    bottom: 3vh;
     margin: 0;
 }
 
 #next-button {
-    padding: 10px 120px;
+    width: 75vw;
+    height: 10vw;
     position: fixed;
-    bottom: 50px;
+    bottom: 3vh;
+    margin: 0;
+}
+
+#change-button {
+    width: 35vw;
+    height: 10vw;
+    position: fixed;
+    transform: translateX(70%);
+    bottom: 3vh;
     margin: 0;
 }
