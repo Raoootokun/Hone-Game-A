@@ -1,10 +1,21 @@
+#dif {
+    display: grid;
+    position: fixed;
+    bottom: 11vh;
+}
+
+#dif-text {
+    position: fixed;
+    bottom: 13.5vh;
+}
+
 #dif-buttons {
     display: flex;
 }
 
-.dot {
+.dif-button {
     width: 20vw;
-    height: 5vh;
+    height: 4vh;
 
     color: rgb(255, 255, 255);
     background: #151515;
@@ -12,11 +23,9 @@
     border-radius: 8px;
     cursor: pointer;
     border: 0.5px solid rgb(187, 187, 187);
-
-    /* transition: 0.15s; */
 }
 
-.active {
+.dif-active {
     background: white;
     color: #151515;
 }

@@ -11,8 +11,7 @@ const maxSize = 11;
 let pieceCnt = 0;
 
 export class Board {
-    constructor() {
-    }
+    constructor() {}
 
     //ボードを作成
     create(pieces, difficulty) {
@@ -133,9 +132,12 @@ function place2(board, pieces, placeHistory, difficulty) {
 
                 //反転させる
                 for (const flip of filps) {
-                    if(difficulty == 1 && maxPieceCount - 2 < pieceCnt)return board;
-                    if(difficulty == 2 && maxPieceCount - 2 < pieceCnt)return board;
-                    if(difficulty == 3 && maxPieceCount - 2 < pieceCnt)return board;
+                    if (difficulty == 1 && maxPieceCount - 2 < pieceCnt)
+                        return board;
+                    if (difficulty == 2 && maxPieceCount - 2 < pieceCnt)
+                        return board;
+                    if (difficulty == 3 && maxPieceCount - 2 < pieceCnt)
+                        return board;
 
                     if (flip) piece = flipPiece(piece);
 
@@ -308,7 +310,7 @@ function rotatePiece(piece) {
 }
 
 function getMaxPieceCount(difficulty) {
-    if(difficulty == 1)return random(3, 5, true);
-    if(difficulty == 2)return random(7, 10, true);
-    if(difficulty == 3)return random(15, 30, true);
+    if (difficulty == 1) return random(3, 5, true);
+    if (difficulty == 2) return random(6, 7, true);
+    if (difficulty == 3) return random(15, 30, true);
 }

@@ -25,18 +25,25 @@
 
             <button id="start-button" class="button">START</button>
 
-            <div id="dif-buttons">
-                <button class="dot active">EASY</button>
-                <button class="dot">NORMAL</button>
-                <button class="dot">HARD</button>
+            <div id="option">
+                <div id="dif">
+                    <p id="dif-text">DIFFICULTY:</p>
+                    <div id="dif-buttons">
+                        <button class="dif-button easy">EASY</button>
+                        <button class="dif-button dif-active normal">
+                            NORMAL
+                        </button>
+                        <button class="dif-button hard">HARD</button>
+                    </div>
+                </div>
+
+                <label class="switch">
+                    <p id="volume-text">VOLUME:</p>
+
+                    <input type="checkbox" id="volume-toggle" />
+                    <span class="slider"></span>
+                </label>
             </div>
-
-            <label class="switch">
-                <p id="volume-text">VOLUME：</p>
-
-                <input type="checkbox" id="volume-toggle" checked />
-                <span class="slider"></span>
-            </label>
         </div>
 
         <!-- プレイ画面 -->

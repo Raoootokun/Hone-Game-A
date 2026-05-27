@@ -4,7 +4,7 @@ import { checkPiece } from "./checkPiece.js";
 import { Piece } from "./Piece.js";
 import { Board } from "./Board.js";
 
-const version = [0, 60, 2];
+const version = [0, 61, 0];
 document.getElementById("version").textContent = `ver.${version.join(".")}`;
 
 // 各シーン取得
@@ -22,6 +22,7 @@ const returnButton = document.getElementById("return-button");
 const undoButton = document.getElementById("undo-button");
 const redoButton = document.getElementById("redo-button");
 const changeButton = document.getElementById("change-button");
+const difButtons = document.querySelectorAll(".dif-button");
 
 const soundOK = new Audio("./sounds/click.mp3");
 
@@ -38,6 +39,7 @@ let historyIdx = 0;
 let touchCnt = 0; //画面タッチ開始からのカウント
 let volume = false;
 let mode = "pen"; //モード
+let difficulty = 2; //難易度
 
 // STARTボタン
 startButton.addEventListener("click", () => {
@@ -97,6 +99,21 @@ document.addEventListener(`pointermove`, (e) => {
     moveTouch(e);
 });
 
+for (const difButton of difButtons) {
+    difButton.addEventListener("click", () => {
+        //すべてのボタンをoff
+        for (const difButton_ of difButtons) {
+            difButton_.classList.remove(`dif-active`);
+        }
+
+        difButton.classList.add(`dif-active`);
+
+        if (difButton.classList.contains(`easy`)) difficulty = 1;
+        else if (difButton.classList.contains(`normal`)) difficulty = 2;
+        else if (difButton.classList.contains(`hard`)) difficulty = 3;
+    });
+}
+
 // シーン切替
 function transScene(sceneName) {
     // 一旦全部隠す
@@ -116,7 +133,7 @@ function transScene(sceneName) {
         loading.style.display = "flex";
         volume = document.getElementById("volume-toggle").checked;
 
-        setTimeout(start, 10);
+        setTimeout(start, 0);
     }
 }
 
@@ -140,14 +157,14 @@ function start() {
 
     //ピースを作成
     pieces = [];
-    const cnt = random(2, 3, true);
+    let cnt = random(2, 3, true);
     for (let i = 0; i < cnt; i++) {
         pieces.push(Piece.create(6));
     }
 
     //ボードを作成
     const boardManager = new Board();
-    board = boardManager.create(pieces, 1);
+    board = boardManager.create(pieces, difficulty);
 
     //ベースのボードをプレイヤー用ボードにコピー
     for (let i = 0; i < board.length; i++) {
@@ -477,10 +494,6 @@ function redo() {
     renderBoard();
 }
 
-// 初期画面
-transScene("game");
-console.log(`Ready!\nver.${version.join(".")}`);
-
 function renderBorder([row, col], element, borderColor) {
     const color = playerBoard[row][col];
 
@@ -572,3 +585,7 @@ function animation() {
         }
     }
 }
+
+// 初期画面
+transScene("start");
+console.log(`Ready!\nver.${version.join(".")}`);

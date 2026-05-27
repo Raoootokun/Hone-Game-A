@@ -61,3 +61,23 @@ body {
     color: white;
     font-size: 10px;
 }
+
+#option {
+    position: fixed;
+    bottom: 5vh;
+
+    display: flex;
+    gap: 20px;
+
+    justify-content: center;
+    align-items: center;
+
+    width: 60vw;
+    height: 11vh;
+    padding: 3%;
+
+    background-color: #303030;
+    border: 2px solid #494949;
+    border-radius: 3px;
+    border-width: 3px;
+}
