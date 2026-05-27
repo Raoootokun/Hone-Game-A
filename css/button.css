@@ -1,6 +1,8 @@
 .button {
     padding: 10px 10px;
     font-size: 20px;
+    /* font-family: monospace; */
+    color: black;
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -15,7 +17,6 @@
 }
 
 #undo-button {
-    color: black;
     font-size: 300%;
     line-height: 0;
     width: 35vw;
@@ -27,7 +28,6 @@
 }
 
 #redo-button {
-    color: black;
     font-size: 300%;
     line-height: 0;
     width: 35vw;
@@ -39,6 +39,7 @@
 }
 
 #reset-button {
+    color: black;
     width: 35vw;
     height: 10vw;
     position: fixed;
@@ -48,6 +49,7 @@
 }
 
 #next-button {
+    color: black;
     width: 75vw;
     height: 10vw;
     position: fixed;
@@ -56,6 +58,7 @@
 }
 
 #change-button {
+    color: black;
     width: 35vw;
     height: 10vw;
     position: fixed;
