@@ -2,10 +2,17 @@
     padding: 10px 10px;
     font-size: 20px;
     /* font-family: monospace; */
-    color: black;
+    color: rgb(255, 255, 255);
+    background: #151515;
     border: none;
     border-radius: 8px;
     cursor: pointer;
+    border: .5px solid rgb(187, 187, 187);
+}
+
+button:active {
+    background: white;
+    color: #151515;
 }
 
 #return-button {
@@ -39,7 +46,6 @@
 }
 
 #reset-button {
-    color: black;
     width: 35vw;
     height: 10vw;
     position: fixed;
@@ -58,6 +64,7 @@
 }
 
 #change-button {
+    font-size: 100%;
     color: black;
     width: 35vw;
     height: 10vw;
@@ -65,4 +72,12 @@
     transform: translateX(70%);
     bottom: 3vh;
     margin: 0;
+}
+
+.mode-pen {
+    background: #ffaf64;
+}
+
+.mode-era {
+    background: #8efff9;
 }

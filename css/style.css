@@ -3,7 +3,7 @@ body {
     width: 100vw;
     height: 100vh;
 
-    background: #0f0f0a;
+    background: #151515;
     color: white;
 
     font-family: sans-serif;
@@ -19,13 +19,11 @@ body {
 }
 
 #version {
+    font-size: 100%;
     position: fixed;
-    top: 10px;
-    left: 10px;
-
+    top: 1%;
+    left: 2%;
     margin: 0;
-
-    font-size: 20px;
     color: white;
 }
 

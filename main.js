@@ -5,7 +5,7 @@ import { checkPiece } from "./checkPiece.js";
 import { Piece } from "./Piece.js";
 import { Board } from "./Board.js";
 
-const version = [0, 59, 21];
+const version = [0, 59, 22];
 document.getElementById("version").textContent = `ver.${version.join(".")}`;
 
 // 各シーン取得
@@ -22,6 +22,7 @@ const nextButton = document.getElementById("next-button");
 const returnButton = document.getElementById("return-button");
 const undoButton = document.getElementById("undo-button");
 const redoButton = document.getElementById("redo-button");
+const changeButton = document.getElementById("change-button");
 
 let ingame = false; //ゲーム中かどうか
 let board; //ベースのボードデータ
@@ -35,6 +36,7 @@ let history = []; //履歴のボードデータ
 let historyIdx = 0;
 let touchCnt = 0; //画面タッチ開始からのカウント
 let volume = false;
+let mode = "pen"; //モード
 
 // STARTボタン
 startButton.addEventListener("click", () => {
@@ -64,6 +66,24 @@ redoButton.addEventListener("click", () => {
     redo();
 });
 
+changeButton.addEventListener("click", () => {
+    //touch中は変更不可
+    if(touchCnt > 0)return;
+
+    //モード切替
+    if(mode == `pen`) {
+        mode = `era`
+        changeButton.textContent = `MODE: ERASER`;
+        changeButton.classList.add(`mode-era`);
+        changeButton.classList.remove(`mode-pen`);
+    }else if(mode == `era`) {
+        mode = `pen`
+        changeButton.textContent = `MODE: PEN`;
+        changeButton.classList.add(`mode-pen`);
+        changeButton.classList.remove(`mode-era`);
+    }
+});
+
 document.addEventListener("pointerdown", (e) => {
     startTouch(e);
 });
@@ -75,6 +95,7 @@ document.addEventListener("pointerup", (e) => {
 document.addEventListener(`pointermove`, (e) => {
     moveTouch(e);
 });
+
 
 // シーン切替
 function transScene(sceneName) {
