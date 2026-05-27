@@ -4,7 +4,7 @@ import { checkPiece } from "./checkPiece.js";
 import { Piece } from "./Piece.js";
 import { Board } from "./Board.js";
 
-const version = [0, 59, 25];
+const version = [0, 60, 0];
 document.getElementById("version").textContent = `ver.${version.join(".")}`;
 
 // 各シーン取得
@@ -67,16 +67,16 @@ redoButton.addEventListener("click", () => {
 
 changeButton.addEventListener("click", () => {
     //touch中は変更不可
-    if(touchCnt > 0)return;
+    if (touchCnt > 0) return;
 
     //モード切替
-    if(mode == `pen`) {
-        mode = `era`
+    if (mode == `pen`) {
+        mode = `era`;
         changeButton.textContent = `MODE: ERASER`;
         changeButton.classList.add(`mode-era`);
         changeButton.classList.remove(`mode-pen`);
-    }else if(mode == `era`) {
-        mode = `pen`
+    } else if (mode == `era`) {
+        mode = `pen`;
         changeButton.textContent = `MODE: PEN`;
         changeButton.classList.add(`mode-pen`);
         changeButton.classList.remove(`mode-era`);
@@ -94,7 +94,6 @@ document.addEventListener("pointerup", (e) => {
 document.addEventListener(`pointermove`, (e) => {
     moveTouch(e);
 });
-
 
 // シーン切替
 function transScene(sceneName) {
@@ -127,6 +126,7 @@ function start() {
     resetButton.classList.remove("hidden");
     undoButton.classList.remove("hidden");
     redoButton.classList.remove("hidden");
+    changeButton.classList.remove("hidden");
 
     //各要素の初期化
     ingame = true;
@@ -245,12 +245,12 @@ function renderBoard() {
                 if (typeof res == `string`) {
                     cell.style.background = res;
 
-                    const test = document.createElement("div");
-                    test.classList.add("test");
-                    test.style.background = res;
-                    cell.appendChild(test);
+                    const border = document.createElement("div");
+                    border.classList.add("test");
+                    border.style.background = res;
+                    cell.appendChild(border);
 
-                    renderBorder([i, j], test);
+                    renderBorder([i, j], border, "#e0e0e0");
                 } else if (res <= -1) {
                     cell.style.background = Color.out;
                 }
@@ -268,7 +268,7 @@ function renderBoard() {
 function moveTouch(e) {
     if (!ingame) return;
     //消しゴムモードの場合
-    if(mode == "era")return;
+    if (mode == "era") return;
 
     //動かした座標のエレメントを取得
     const element = document.elementFromPoint(e.x, e.y);
@@ -298,17 +298,20 @@ function moveTouch(e) {
 //画面タッチを開始
 function startTouch(e) {
     if (!ingame) return;
-        
-    if(mode == "pen") {
+
+    if (mode == "pen") {
         //セルの色を決定
         // color = Color.filleds[random(0, Color.filleds.length - 1, true)];
         color = Color.getRandom();
 
         //プレイヤーのピースデータを初期化
         playerPiece = [];
-    }else if(mode == "era") {
+    } else if (mode == "era") {
         //動かした座標のエレメントを取得
-        for(const element of document.elementsFromPoint(e.clientX, e.clientY)) {
+        for (const element of document.elementsFromPoint(
+            e.clientX,
+            e.clientY,
+        )) {
             if (!element.classList.contains(`cell`)) continue;
 
             //座標を取得
@@ -327,14 +330,13 @@ function startTouch(e) {
             //状態を取得
             const state = playerBoard[row][col];
             //同じ状態のセルを削除
-            for(let i=0; i<playerBoard.length; i++) {
-                for(let j=0; j<playerBoard[i].length; j++) {
-                    if(playerBoard[i][j] == state)playerBoard[i][j] = 0;
+            for (let i = 0; i < playerBoard.length; i++) {
+                for (let j = 0; j < playerBoard[i].length; j++) {
+                    if (playerBoard[i][j] == state) playerBoard[i][j] = 0;
                 }
             }
 
             renderBoard();
-
         }
     }
 }
@@ -343,7 +345,7 @@ function startTouch(e) {
 function endTouch() {
     if (!ingame) return;
     touchCnt = 0;
-    if(mode == "era")return;
+    if (mode == "era") return;
 
     //画面タッチ終了時にピースをチェック
     if (playerPiece.length == 0) return;
@@ -366,7 +368,7 @@ function endTouch() {
             test.style.background = color;
             element.appendChild(test);
 
-            renderBorder(piece, test);
+            renderBorder(piece, test, "#e0e0e0");
         }
 
         //ボードがすべて埋まった場合
@@ -380,10 +382,15 @@ function endTouch() {
             ) === JSON.stringify(board);
 
         if (ok) {
+            animation();
+            renderAllBorder();
+
             resetButton.classList.add("hidden");
             undoButton.classList.add("hidden");
             redoButton.classList.add("hidden");
+            changeButton.classList.add("hidden");
             nextButton.classList.remove("hidden");
+
             ingame = false;
         }
     } else {
@@ -467,20 +474,11 @@ function redo() {
     renderBoard();
 }
 
-//識別IDを作成
-function createId() {
-    let id = ``;
-    for(let i=0; i<5; i++) {
-        id += `${random(0, 9, true)}`;
-    }
-    return id;
-}
-
 // 初期画面
 transScene("game");
 console.log(`Ready!\nver.${version.join(".")}`);
 
-function renderBorder([row, col], element) {
+function renderBorder([row, col], element, borderColor) {
     const color = playerBoard[row][col];
 
     const dires = [
@@ -501,7 +499,7 @@ function renderBorder([row, col], element) {
             playerBoard[neRow] === undefined ||
             playerBoard[neRow][neCol] === undefined
         ) {
-            element.style[`border${dire}`] = "3px solid #e0e0e0";
+            element.style[`border${dire}`] = `3px solid ${borderColor}`;
 
             continue;
         }
@@ -511,16 +509,63 @@ function renderBorder([row, col], element) {
 
         //どこにも隣接していない場合
         if (!isConnected) {
-            element.style[`border${dire}`] = "3px solid #e0e0e0";
+            element.style[`border${dire}`] = `3px outset ${borderColor}`;
         }
     }
 }
 
+function renderAllBorder() {
+    const dires = [
+        [-1, 0, "Top"],
+        [1, 0, "Bottom"],
+        [0, -1, "Left"],
+        [0, 1, "Right"],
+    ];
 
-class Eraser {
-    //タッチ開始
-    static start() {
-        
+    for (let row = 0; row < playerBoard.length; row++) {
+        for (let col = 0; col < playerBoard[row].length; col++) {
+            const element = cellElements[row][col];
+            //虚空の場合
+            if (element.classList.contains(`none`)) continue;
+
+            const border = element.querySelector(".test");
+            border.style.border = "";
+
+            for (const [direRow, direCol, dire] of dires) {
+                //各向きを追加した座標
+                const neRow = 1 * row + direRow;
+                const neCol = 1 * col + direCol;
+
+                //範囲外の場合
+                if (
+                    playerBoard[neRow] === undefined ||
+                    playerBoard[neRow][neCol] === undefined
+                ) {
+                    border.style[`border${dire}`] = "3px outset #e0e0e0";
+                    continue;
+                }
+
+                //隣接しているか
+                const isConnected = isNaN(playerBoard[neRow][neCol]);
+
+                //どこにも隣接していない場合
+                if (!isConnected) {
+                    border.style[`border${dire}`] = "3px outset #e0e0e0";
+                }
+            }
+        }
     }
+}
 
+function animation() {
+    for (let row = 0; row < playerBoard.length; row++) {
+        for (let col = 0; col < playerBoard[row].length; col++) {
+            const element = cellElements[row][col];
+            //虚空の場合
+            if (element.classList.contains(`none`)) continue;
+
+            const border = element.querySelector(".test");
+            border.classList.add("flash");
+        }
+    }
 }
