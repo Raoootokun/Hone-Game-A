@@ -4,7 +4,7 @@ import { checkPiece } from "./checkPiece.js";
 import { Piece } from "./Piece.js";
 import { Board } from "./Board.js";
 
-const version = [0, 59, 23];
+const version = [0, 59, 25];
 document.getElementById("version").textContent = `ver.${version.join(".")}`;
 
 // 各シーン取得
@@ -145,11 +145,11 @@ function start() {
 
     //ボードを作成
     const boardManager = new Board();
-    board = boardManager.create(pieces, 2);
+    board = boardManager.create(pieces, 1);
 
     //ベースのボードをプレイヤー用ボードにコピー
     for (let i = 0; i < board.length; i++) {
-        playerBoard.push(new Array(board.length).fill(0));
+        playerBoard.push(new Array(board[i].length).fill(0));
     }
 
     //セルボードを初期化
@@ -251,7 +251,7 @@ function renderBoard() {
                     cell.appendChild(test);
 
                     renderBorder([i, j], test);
-                } else if (res == -1) {
+                } else if (res <= -1) {
                     cell.style.background = Color.out;
                 }
             } else cell.classList.add("none");
@@ -320,9 +320,21 @@ function startTouch(e) {
             //マスが空白の場合
             if (!playerBoard[row][col]) continue;
 
+            history.splice(historyIdx, history.length);
+            historyIdx++;
+            history.push(JSON.parse(JSON.stringify(playerBoard)));
+
             //状態を取得
             const state = playerBoard[row][col];
-            console.log(state)
+            //同じ状態のセルを削除
+            for(let i=0; i<playerBoard.length; i++) {
+                for(let j=0; j<playerBoard[i].length; j++) {
+                    if(playerBoard[i][j] == state)playerBoard[i][j] = 0;
+                }
+            }
+
+            renderBoard();
+
         }
     }
 }
@@ -335,7 +347,6 @@ function endTouch() {
 
     //画面タッチ終了時にピースをチェック
     if (playerPiece.length == 0) return;
-
     const res = checkPiece(pieces, playerPiece);
 
     if (res) {
@@ -363,10 +374,11 @@ function endTouch() {
             JSON.stringify(
                 playerBoard.map((a) =>
                     a.map((a) => {
-                        return a != 1 && a != 0 ? 1 : 0;
+                        return isNaN(a) ? 1 : 0;
                     }),
                 ),
             ) === JSON.stringify(board);
+
         if (ok) {
             resetButton.classList.add("hidden");
             undoButton.classList.add("hidden");
@@ -384,6 +396,7 @@ function endTouch() {
         }
 
         //セルの色を変更
+        const num = random(-5, -1, true);
         for (let i = 0; i < playerPiece.length; i++) {
             const row = playerPiece[i][0];
             const col = playerPiece[i][1];
@@ -391,7 +404,7 @@ function endTouch() {
             const cell = cellElements[row][col];
             if (cell.dataset.row == row && cell.dataset.col == col) {
                 cell.style.background = Color.out;
-                playerBoard[row][col] = -1;
+                playerBoard[row][col] = num;
             }
         }
     }
