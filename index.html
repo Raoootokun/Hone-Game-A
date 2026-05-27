@@ -13,6 +13,7 @@
         <link rel="stylesheet" href="css/switch.css" />
         <link rel="stylesheet" href="css/piece.css" />
         <link rel="stylesheet" href="css/sample-piece.css" />
+        <link rel="stylesheet" href="css/dif.css" />
     </head>
 
     <body>
@@ -24,10 +25,16 @@
 
             <button id="start-button" class="button">START</button>
 
+            <div id="dif-buttons">
+                <button class="dot active">EASY</button>
+                <button class="dot">NORMAL</button>
+                <button class="dot">HARD</button>
+            </div>
+
             <label class="switch">
                 <p id="volume-text">VOLUME：</p>
 
-                <input type="checkbox" id="volume-toggle" />
+                <input type="checkbox" id="volume-toggle" checked />
                 <span class="slider"></span>
             </label>
         </div>

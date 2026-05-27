@@ -1,0 +1,22 @@
+#dif-buttons {
+    display: flex;
+}
+
+.dot {
+    width: 20vw;
+    height: 5vh;
+
+    color: rgb(255, 255, 255);
+    background: #151515;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 0.5px solid rgb(187, 187, 187);
+
+    /* transition: 0.15s; */
+}
+
+.active {
+    background: white;
+    color: #151515;
+}

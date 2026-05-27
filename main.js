@@ -4,7 +4,7 @@ import { checkPiece } from "./checkPiece.js";
 import { Piece } from "./Piece.js";
 import { Board } from "./Board.js";
 
-const version = [0, 60, 0];
+const version = [0, 60, 1];
 document.getElementById("version").textContent = `ver.${version.join(".")}`;
 
 // 各シーン取得
@@ -22,6 +22,8 @@ const returnButton = document.getElementById("return-button");
 const undoButton = document.getElementById("undo-button");
 const redoButton = document.getElementById("redo-button");
 const changeButton = document.getElementById("change-button");
+
+const soundOK = new Audio("./sounds/click.mp3");
 
 let ingame = false; //ゲーム中かどうか
 let board; //ベースのボードデータ
@@ -355,8 +357,8 @@ function endTouch() {
         //正解
         //サウンド再生
         if (volume) {
-            const sound = new Audio("./sounds/click.mp3");
-            sound.play();
+            soundOK.playbackRate = 1.5;
+            soundOK.play();
         }
 
         //正解したピースにボーダーを表示
