@@ -4,7 +4,7 @@ import { checkPiece } from "./checkPiece.js";
 import { Piece } from "./Piece.js";
 import { Board } from "./Board.js";
 
-const version = [0, 61, 0];
+const version = [1, 0, 0];
 document.getElementById("version").textContent = `ver.${version.join(".")}`;
 
 // 各シーン取得
